@@ -237,9 +237,6 @@
       border: 1px solid var(--borde); border-radius: 10px; padding: 12px;
       margin-bottom: 10px; background: #f8fafc;
     }
-    .order-item.destacada {
-      border: 2px solid var(--color-primario); background: var(--color-suave);
-    }
     .order-top {
       display: flex; justify-content: space-between; align-items: center;
       gap: 8px; flex-wrap: wrap; margin-bottom: 6px;
@@ -381,7 +378,7 @@
           <strong>3. Inspección Visual y Foto del Vehículo:</strong> Tomar la foto principal del vehículo; si en inspección visual hay novedad (abolladura, rayón o espejo roto), tomar fotos, marcar pines y describir cada pin por separado.
         </div>
         <div class="proto-step">
-          <strong>4. Registro y envío a Secretaría:</strong> Solicitar retiro de objetos de valor, guardar el ingreso y enviar el enlace directo en 1 clic a secretaría.
+          <strong>4. Registro y envío a Secretaría:</strong> Solicitar retiro de objetos de valor, guardar el ingreso y enviar el enlace de la interfaz a secretaría.
         </div>
         <div class="proto-step">
           <strong>5. Trabajo realizado, Servicios, Prueba Final y Entrega:</strong> Registrar el trabajo realizado, agregar los servicios con cantidad y precio, registrar el estado de entrega, prueba final y forma de pago, cerrar la orden y enviar por WhatsApp o Email.
@@ -890,10 +887,7 @@
   </div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const CANAL_TALLER = (urlParams.get("taller") || "clickauto").replace(/[^a-zA-Z0-9_-]/g, "") || "clickauto";
-    const ORDEN_URL_ID = urlParams.get("orden") || "";
-    const FB_URL_PARAM = urlParams.get("fb") || "";
+    const CANAL_TALLER = "clickauto";
 
     const KEY_CFG = "clickauto_cfg_v28_" + CANAL_TALLER;
     const KEY_ORD = "clickauto_ordenes_v28_" + CANAL_TALLER;
@@ -914,11 +908,6 @@
     };
 
     let cfg = loadCfg();
-    if (FB_URL_PARAM && !cfg.firebaseUrl) {
-      cfg.firebaseUrl = FB_URL_PARAM.replace(/\/+$/, "");
-      saveCfg(false);
-    }
-
     let ordenes = loadOrdenes();
     let ordenSeleccionadaId = null;
 
@@ -981,10 +970,8 @@
       return base + "/taller_" + CANAL_TALLER + ".json";
     }
 
-    function construirEnlaceCompartible(ordenId) {
-      const url = new URL(window.location.href.split("?")[0]);
-      if (ordenId) url.searchParams.set("orden", ordenId);
-      return url.toString();
+    function construirEnlaceCompartible() {
+      return window.location.href.split("?")[0];
     }
 
     function actualizarBadgeSync(texto) {
@@ -1021,11 +1008,11 @@
       }
     }
 
-    async function sincronizarDesdeNube(abrirOrdenUrl) {
+    async function sincronizarDesdeNube(abrirTallerSiHay) {
       const endpoint = obtenerEndpointNube();
       if (!endpoint) {
         actualizarBadgeSync("● Activo");
-        if (abrirOrdenUrl && ORDEN_URL_ID) irATab(3);
+        if (abrirTallerSiHay) irATab(3);
         return;
       }
       try {
@@ -1050,17 +1037,8 @@
         if (ordenSeleccionadaId) {
           const existe = ordenes.find(function (o) { return o.id === ordenSeleccionadaId; });
           if (existe) cargarOrdenPorId(ordenSeleccionadaId, false);
-        } else if (abrirOrdenUrl && ORDEN_URL_ID) {
-          const encontrada = ordenes.find(function (o) { return String(o.id) === String(ORDEN_URL_ID); });
-          if (encontrada) {
-            if (encontrada.estado === "taller") {
-              irATab(3);
-            } else {
-              cargarOrdenPorId(encontrada.id, true);
-            }
-          } else {
-            irATab(3);
-          }
+        } else if (abrirTallerSiHay) {
+          irATab(3);
         }
         actualizarBadgeSync("● Sincronizado");
       } catch (e) {
@@ -1211,7 +1189,7 @@
       document.getElementById("cfgPortalPlaca").value = cfg.portalPlaca || "";
       document.getElementById("cfgPortalCedula").value = cfg.portalCedula || "";
       document.getElementById("cfgFirebaseUrl").value = cfg.firebaseUrl || "";
-      document.getElementById("infoLinkCompartir").textContent = "Enlace sincronizado: " + construirEnlaceCompartible();
+      document.getElementById("infoLinkCompartir").textContent = "Enlace de interfaz: " + construirEnlaceCompartible();
       document.getElementById("modalConfig").classList.add("open");
     }
 
@@ -1682,13 +1660,12 @@
       }
 
       let d = null;
-      let enlaceOrden = construirEnlaceCompartible();
+      const enlaceInterfaz = construirEnlaceCompartible();
 
       if (document.getElementById("recPlaca").value.trim() && document.getElementById("recCliente").value.trim()) {
         const creada = crearYGuardarOrdenDesdeRecepcion();
         if (!creada) return;
         d = creada;
-        enlaceOrden = construirEnlaceCompartible(creada.id);
         limpiarFormularioRecepcion();
         irATab(3);
       } else {
@@ -1731,7 +1708,7 @@
       lineas.push(
         "Lo que hay en el vehículo: " + d.loQueHayEnVehiculo,
         "",
-        enlaceOrden
+        enlaceInterfaz
       );
 
       window.open("https://wa.me/" + numSec + "?text=" + encodeURIComponent(lineas.join("\n")), "_blank", "noopener,noreferrer");
@@ -2212,9 +2189,8 @@
       document.getElementById("contenedorTaller").innerHTML = taller.length === 0
         ? '<p style="color:#64748b; font-size:13px;">No hay vehículos en taller.</p>'
         : taller.map(function (o) {
-            const esEnlace = ORDEN_URL_ID && String(o.id) === String(ORDEN_URL_ID);
             return (
-              '<div class="order-item' + (esEnlace ? ' destacada' : '') + '">' +
+              '<div class="order-item">' +
                 '<div class="order-top">' +
                   '<strong>' + escapeHtml(o.placa) + ' · ' + escapeHtml(o.vehiculo) + '</strong>' +
                   '<span class="tag">' + escapeHtml(o.ot || "SIN OT") + '</span>' +
