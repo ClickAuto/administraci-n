@@ -1,0 +1,2305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLICK AUTO - SERVICIO AUTOMOTRIZ</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/jpeg" href="icon-512.jpg" />
+  <link rel="apple-touch-icon" href="icon-512.jpg" />
+  <meta name="theme-color" content="#1565c0" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <style>
+    :root {
+      --color-primario: #1976d2;
+      --color-oscuro: #0d47a1;
+      --color-suave: #eff6ff;
+      --fondo: #f1f5f9;
+      --tarjeta: #ffffff;
+      --borde: #e2e8f0;
+      --texto: #1e293b;
+      --texto-sec: #64748b;
+      --verde: #16a34a;
+      --naranja: #d97706;
+      --rojo: #dc2626;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--fondo);
+      color: var(--texto);
+    }
+
+    .top-header {
+      background: linear-gradient(135deg, var(--color-primario), var(--color-oscuro));
+      color: #ffffff;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    }
+
+    .brand-left { display: flex; align-items: center; gap: 10px; }
+    .brand-left img {
+      width: 40px; height: 40px; border-radius: 6px;
+      background: #ffffff; object-fit: cover; padding: 2px;
+    }
+    .brand-title { font-size: 14px; font-weight: 800; margin: 0; text-transform: uppercase; }
+    .brand-sub { font-size: 11px; opacity: 0.92; margin-top: 2px; }
+
+    .badge-activo {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: #ffffff; font-size: 11px; font-weight: 700;
+      padding: 4px 10px; border-radius: 999px; white-space: nowrap;
+    }
+
+    .nav-tabs {
+      background: #ffffff; border-bottom: 1px solid var(--borde);
+      display: flex; align-items: center; overflow-x: auto; padding: 0 8px;
+    }
+    .nav-tab {
+      background: transparent; border: none; border-bottom: 3px solid transparent;
+      color: var(--texto-sec); font-size: 13px; font-weight: 600;
+      padding: 12px 14px; cursor: pointer; white-space: nowrap;
+    }
+    .nav-tab.active {
+      color: var(--color-primario); border-bottom-color: var(--color-primario);
+      background: var(--color-suave);
+    }
+    .nav-gear {
+      margin-left: auto; background: transparent; border: none;
+      color: var(--color-primario); font-size: 17px; padding: 10px 12px; cursor: pointer;
+    }
+
+    .container { max-width: 880px; margin: 16px auto; padding: 0 14px 30px; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .card {
+      background: var(--tarjeta); border: 1px solid var(--borde);
+      border-radius: 12px; padding: 16px;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05); margin-bottom: 14px;
+    }
+    .card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 10px; margin-bottom: 12px; flex-wrap: wrap;
+    }
+    .card-title { margin: 0; font-size: 16px; font-weight: 700; color: var(--color-oscuro); }
+
+    .proto-step {
+      background: #f8fafc; border-left: 4px solid var(--color-primario);
+      border-radius: 8px; padding: 11px 14px; margin-bottom: 9px;
+      font-size: 13.5px; line-height: 1.5; color: #334155;
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    @media (max-width: 680px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr 1fr; }
+    }
+
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 5px; }
+
+    .input-con-btn {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .input-con-btn input { flex: 1; min-width: 0; }
+    .btn-portal-inline {
+      display: none; background: var(--color-primario); color: #ffffff;
+      border: none; border-radius: 8px; padding: 10px 11px; font-size: 12px;
+      font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
+    .btn-portal-inline.visible { display: inline-flex; align-items: center; gap: 4px; }
+    .btn-portal-inline:hover { background: var(--color-oscuro); }
+
+    .chips-motivo {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px;
+    }
+    .chip-motivo {
+      background: var(--color-suave); color: var(--color-oscuro);
+      border: 1px solid #bfdbfe; border-radius: 999px;
+      padding: 5px 10px; font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .chip-motivo:hover { background: #dbeafe; }
+
+    .hint-status {
+      font-size: 11.5px; font-weight: 600; color: var(--color-primario);
+      margin-top: 4px; min-height: 16px; word-break: break-word;
+    }
+
+    input[type="text"], input[type="tel"], input[type="email"], input[type="url"],
+    input[type="number"], select, textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1;
+      border-radius: 8px; background: #f8fafc; color: #0f172a;
+      font-size: 14px; font-family: inherit;
+    }
+    input[type="color"] {
+      width: 56px; height: 38px; padding: 2px;
+      border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; cursor: pointer;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--color-primario); background: #ffffff;
+    }
+
+    .check-item {
+      display: flex; align-items: center; gap: 7px; background: #f8fafc;
+      border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px;
+      font-size: 13px; font-weight: 600; color: #1e293b; cursor: pointer;
+    }
+    .check-item input[type="checkbox"] { width: 16px; height: 16px; margin: 0; }
+
+    .timer-banner {
+      background: var(--color-suave); border: 1px solid #bfdbfe;
+      border-radius: 10px; padding: 12px 14px; display: flex;
+      justify-content: space-between; align-items: center; flex-wrap: wrap;
+      gap: 10px; margin-bottom: 14px;
+    }
+    .timer-val {
+      font-size: 20px; font-weight: 800; font-family: monospace; color: var(--color-oscuro);
+    }
+
+    /* FOTOS DE NOVEDAD CON PINES Y DESCRIPCIÓN INDIVIDUAL */
+    .novedad-fotos-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 10px; margin-top: 10px;
+    }
+    .novedad-foto-card {
+      border: 1px solid #cbd5e1; border-radius: 10px; background: #f8fafc; padding: 8px;
+    }
+    .novedad-lienzo {
+      position: relative; width: 100%; height: 165px; border-radius: 8px;
+      overflow: hidden; background: #0f172a; cursor: crosshair; user-select: none;
+    }
+    .novedad-lienzo img {
+      width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none;
+    }
+    .foto-del {
+      position: absolute; top: 6px; right: 6px; background: rgba(220, 38, 38, 0.92);
+      color: #fff; border: none; border-radius: 50%; width: 24px; height: 24px;
+      font-size: 13px; cursor: pointer; font-weight: bold; z-index: 3;
+    }
+    .pin-marker {
+      position: absolute; transform: translate(-50%, -100%);
+      background: var(--rojo); color: #ffffff; border: 2px solid #ffffff;
+      border-radius: 999px; min-width: 22px; height: 22px; padding: 0 5px;
+      font-size: 11px; font-weight: 800; display: flex; align-items: center;
+      justify-content: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+      pointer-events: none; z-index: 2;
+    }
+    .pin-desc-card {
+      border: 1px solid #fecaca; background: #fff5f5; border-radius: 8px;
+      padding: 9px 10px; margin-top: 8px;
+    }
+    .pin-desc-header {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 8px; margin-bottom: 6px; font-size: 12.5px; font-weight: 800; color: #991b1b;
+    }
+    .pin-desc-del {
+      background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;
+      border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; cursor: pointer;
+    }
+    .pin-report-item {
+      padding: 5px 0; border-bottom: 1px dashed #cbd5e1; font-size: 12.5px;
+    }
+    .pin-report-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .foto-principal-box {
+      width: 170px; height: 120px; border: 1px solid #cbd5e1; border-radius: 8px;
+      background: #f8fafc; overflow: hidden; display: flex; align-items: center;
+      justify-content: center; font-size: 12px; color: #64748b; margin-top: 8px;
+    }
+    .foto-principal-box img { width: 100%; height: 100%; object-fit: cover; }
+
+    .btn {
+      border: none; border-radius: 8px; padding: 10px 14px; font-size: 13.5px;
+      font-weight: 700; cursor: pointer; display: inline-flex; align-items: center;
+      justify-content: center; gap: 6px;
+    }
+    .btn-block { width: 100%; padding: 12px; font-size: 14px; }
+    .btn-primary { background: var(--color-primario); color: #fff; }
+    .btn-primary:hover { background: var(--color-oscuro); }
+    .btn-success { background: var(--verde); color: #fff; }
+    .btn-warning { background: var(--naranja); color: #fff; }
+    .btn-danger { background: var(--rojo); color: #fff; }
+    .btn-light { background: #e2e8f0; color: #1e293b; }
+
+    .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+    .order-item {
+      border: 1px solid var(--borde); border-radius: 10px; padding: 12px;
+      margin-bottom: 10px; background: #f8fafc;
+    }
+    .order-item.destacada {
+      border: 2px solid var(--color-primario); background: var(--color-suave);
+    }
+    .order-top {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 8px; flex-wrap: wrap; margin-bottom: 6px;
+    }
+    .tag {
+      background: var(--color-suave); color: var(--color-oscuro);
+      font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;
+    }
+
+    .servicio-fila-form {
+      display: grid; grid-template-columns: 80px 1fr 110px auto;
+      gap: 8px; align-items: center; margin-bottom: 8px;
+    }
+    @media (max-width: 640px) {
+      .servicio-fila-form { grid-template-columns: 70px 1fr; }
+    }
+
+    /* HOJA DEL INFORME PDF VERTICAL */
+    .pdf-sheet {
+      background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px;
+      padding: 18px; color: #0f172a; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+      max-width: 760px; margin: 0 auto;
+    }
+    .pdf-top {
+      display: flex; align-items: center; gap: 14px;
+      border-bottom: 3px solid var(--color-primario); padding-bottom: 12px; margin-bottom: 14px;
+    }
+    .pdf-top img {
+      width: 58px; height: 58px; object-fit: cover; border-radius: 8px;
+      border: 1px solid #cbd5e1; background: #ffffff;
+    }
+    .pdf-title { margin: 0; font-size: 16px; font-weight: 800; color: var(--color-oscuro); text-transform: uppercase; }
+    .pdf-sub { font-size: 12px; color: #475569; margin-top: 2px; }
+
+    .pdf-hero-grid {
+      display: grid; grid-template-columns: 155px 1fr 1fr; gap: 12px;
+      align-items: start; margin-bottom: 10px;
+    }
+    @media (max-width: 720px) { .pdf-hero-grid { grid-template-columns: 1fr; } }
+
+    .pdf-auto-foto {
+      width: 100%; height: 125px; border-radius: 8px; border: 1px solid #cbd5e1;
+      background: #f1f5f9; display: flex; align-items: center; justify-content: center;
+      overflow: hidden; font-size: 11px; color: #64748b; text-align: center; padding: 4px;
+    }
+    .pdf-auto-foto img { width: 100%; height: 100%; object-fit: cover; }
+
+    .pdf-box {
+      border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;
+      background: #f8fafc; font-size: 12.5px; line-height: 1.5;
+    }
+    .pdf-box-title {
+      font-size: 12px; font-weight: 800; text-transform: uppercase;
+      color: var(--color-oscuro); margin: 0 0 6px;
+      border-bottom: 1px solid #cbd5e1; padding-bottom: 3px;
+    }
+    .pdf-sec-title {
+      font-size: 12.5px; font-weight: 800; text-transform: uppercase;
+      color: var(--color-oscuro); background: var(--color-suave);
+      padding: 6px 10px; border-left: 4px solid var(--color-primario);
+      border-radius: 4px; margin: 12px 0 8px;
+    }
+    .pdf-center-banner {
+      font-size: 12.5px; font-weight: 400;
+      color: var(--color-oscuro); background: var(--color-suave);
+      border: 1px solid #bfdbfe; border-radius: 6px;
+      padding: 7px 12px; margin: 10px 0 8px; text-align: center; line-height: 1.5;
+    }
+    .pdf-times-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+      gap: 8px; font-size: 12.5px;
+    }
+    .pdf-time-item {
+      border: 1px solid #e2e8f0; border-radius: 7px; padding: 7px 9px; background: #f8fafc;
+    }
+    .pdf-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 6px; }
+    .pdf-table th, .pdf-table td { border: 1px solid #cbd5e1; padding: 7px 9px; text-align: left; }
+    .pdf-table th { background: #f1f5f9; color: #1e293b; font-weight: 700; }
+    .pdf-table td.num, .pdf-table th.num { text-align: right; white-space: nowrap; }
+    .pdf-total-row td { font-weight: 800; background: #f8fafc; color: var(--color-oscuro); }
+
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55);
+      z-index: 100; align-items: center; justify-content: center; padding: 14px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-card {
+      background: #ffffff; border-radius: 12px; max-width: 560px; width: 100%;
+      max-height: 90vh; overflow-y: auto; padding: 18px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #areaImpresionPDF, #areaImpresionPDF * { visibility: visible; }
+      #areaImpresionPDF {
+        position: absolute; left: 0; top: 0; width: 100%;
+        border: none; box-shadow: none; padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="top-header">
+    <div class="brand-left">
+      <img class="logo-img" src="icon-512.jpg" alt="ClickAuto" onerror="this.style.display='none'" />
+      <div>
+        <h1 class="brand-title" id="hdrNombreTaller">CLICK AUTO - SERVICIO AUTOMOTRIZ</h1>
+        <div class="brand-sub" id="hdrSubtitulo">Av. 11 de Noviembre y Eduardo Kingman · 0998415827</div>
+      </div>
+    </div>
+    <span class="badge-activo" id="badgeSyncEstado">● Activo</span>
+  </header>
+
+  <nav class="nav-tabs" role="tablist">
+    <button type="button" class="nav-tab active" data-tab="1" onclick="irATab(1)">1. Protocolo</button>
+    <button type="button" class="nav-tab" data-tab="2" onclick="irATab(2)">2. Recepción</button>
+    <button type="button" class="nav-tab" data-tab="3" onclick="irATab(3)">3. Taller (<span id="badgeTaller">0</span>)</button>
+    <button type="button" class="nav-tab" data-tab="4" onclick="irATab(4)">4. Entrega (<span id="badgeEntrega">0</span>)</button>
+    <button type="button" class="nav-tab" data-tab="5" onclick="irATab(5)">5. Historial (<span id="badgeHistorial">0</span>)</button>
+    <button type="button" class="nav-gear" title="Configuración" onclick="abrirConfig()">⚙️</button>
+  </nav>
+
+  <div class="container">
+    <!-- PESTAÑA 1: PROTOCOLO -->
+    <section class="tab-content active" id="tab-1" style="display:block;">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">📋 Protocolo de Recepción y Entrega</h2>
+          <button type="button" class="btn btn-light" onclick="window.print()">🖨️ Imprimir</button>
+        </div>
+
+        <div class="proto-step">
+          <strong>1. Bienvenida:</strong> Saludar cordialmente al cliente, presentarse con su nombre y consultar el motivo de su visita.
+        </div>
+        <div class="proto-step">
+          <strong>2. Motivo de ingreso (Mantenimiento preventivo o Falla):</strong> Seleccionar si ingresa por mantenimiento preventivo o si presenta falla para registrar síntomas, testigos y prueba de ruta inicial.
+        </div>
+        <div class="proto-step">
+          <strong>3. Inspección Visual y Foto del Vehículo:</strong> Tomar la foto principal del vehículo; si en inspección visual hay novedad (abolladura, rayón o espejo roto), tomar fotos, marcar pines y describir cada pin por separado.
+        </div>
+        <div class="proto-step">
+          <strong>4. Registro y envío a Secretaría:</strong> Solicitar retiro de objetos de valor, guardar el ingreso y enviar el enlace directo en 1 clic a secretaría.
+        </div>
+        <div class="proto-step">
+          <strong>5. Trabajo realizado, Servicios, Prueba Final y Entrega:</strong> Registrar el trabajo realizado, agregar los servicios con cantidad y precio, registrar el estado de entrega, prueba final y forma de pago, cerrar la orden y enviar por WhatsApp o Email.
+        </div>
+
+        <button type="button" class="btn btn-primary btn-block" onclick="iniciarNuevaRecepcionDesdeProtocolo()">
+          Siguiente ➡️ Ir a Recepción del Vehículo
+        </button>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 2: RECEPCIÓN -->
+    <section class="tab-content" id="tab-2" style="display:none;">
+      <div class="timer-banner">
+        <div>
+          <div style="font-size:11px; font-weight:700; color:var(--color-oscuro);">⏱️ TIEMPO DE RECEPCIÓN (AUTOMÁTICO)</div>
+          <div class="timer-val" id="cronoRecepcionTxt">00:00:00</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">🚗 Datos del Cliente y Vehículo</h2>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="recCedula">Cédula del cliente</label>
+            <div class="input-con-btn">
+              <input id="recCedula" type="text" maxlength="13" placeholder="0601234567"
+                oninput="autocompletarClienteLocal(); actualizarBotonCedula()"
+                onkeydown="if(event.key==='Enter'){ event.preventDefault(); abrirPortalCedula(); }" />
+              <button type="button" id="btnPortalCedula" class="btn-portal-inline" onclick="abrirPortalCedula()">🌐 Consultar</button>
+            </div>
+            <div class="hint-status" id="estadoCedula"></div>
+          </div>
+          <div class="form-group">
+            <label for="recPlaca">Placa *</label>
+            <div class="input-con-btn">
+              <input id="recPlaca" type="text" maxlength="8" placeholder="ABC-1234"
+                oninput="this.value=this.value.toUpperCase(); autocompletarVehiculoLocal(); actualizarBotonPlaca()"
+                onkeydown="if(event.key==='Enter'){ event.preventDefault(); abrirPortalPlaca(); }" />
+              <button type="button" id="btnPortalPlaca" class="btn-portal-inline" onclick="abrirPortalPlaca()">🌐 Consultar</button>
+            </div>
+            <div class="hint-status" id="estadoPlaca"></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="recOt">N° Orden de Trabajo (OT)</label>
+            <input id="recOt" type="text" placeholder="OT-101" />
+          </div>
+          <div class="form-group">
+            <label for="recCliente">Cliente *</label>
+            <input id="recCliente" type="text" placeholder="Nombre del cliente" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="recWhatsapp">Teléfono / WhatsApp *</label>
+            <input id="recWhatsapp" type="tel" placeholder="0991234567" />
+          </div>
+          <div class="form-group">
+            <label for="recEmail">Email del cliente (opcional)</label>
+            <input id="recEmail" type="email" placeholder="cliente@correo.com" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="recVehiculo">Vehículo (Marca/Modelo/Año) *</label>
+          <input id="recVehiculo" type="text" placeholder="Mazda BT-50 2010" />
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="recKm">Kilometraje</label>
+            <input id="recKm" type="text" placeholder="145000" />
+          </div>
+          <div class="form-group">
+            <label for="recCombustible">Combustible</label>
+            <select id="recCombustible">
+              <option value="Reserva">Reserva</option>
+              <option value="1/4">1/4</option>
+              <option value="1/2" selected>1/2</option>
+              <option value="3/4">3/4</option>
+              <option value="Lleno">Lleno</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="recAsesorSelect">Asesor / Técnico que receptó *</label>
+          <select id="recAsesorSelect"></select>
+        </div>
+      </div>
+
+      <!-- DESGLOSE: MANTENIMIENTO PREVENTIVO vs FALLA -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">🛠️ Motivo de Ingreso al Taller</h2>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="recTipoIngreso">Selecciona el tipo de atención</label>
+          <select id="recTipoIngreso" onchange="toggleBloqueFalla()">
+            <option value="Mantenimiento preventivo" selected>Mantenimiento preventivo</option>
+            <option value="Falla / Diagnóstico">Falla / Diagnóstico</option>
+          </select>
+        </div>
+
+        <div id="bloqueFallaDetalles" style="display:none; margin-top:14px; border-top:1px solid var(--borde); padding-top:14px;">
+          <div class="form-group">
+            <label for="recFalla">Falla que tenía / reporte del cliente *</label>
+            <textarea id="recFalla" rows="3" placeholder="Síntomas, ruidos o fallas reportadas"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Testigos encendidos en el tablero</label>
+            <div class="grid-3" id="grupoTestigos">
+              <label class="check-item"><input type="checkbox" value="Check Engine" /> Check Engine</label>
+              <label class="check-item"><input type="checkbox" value="ABS" /> ABS</label>
+              <label class="check-item"><input type="checkbox" value="Airbag" /> Airbag</label>
+              <label class="check-item"><input type="checkbox" value="Batería" /> Batería</label>
+              <label class="check-item"><input type="checkbox" value="Aceite" /> Aceite</label>
+              <label class="check-item"><input type="checkbox" value="Temperatura" /> Temperatura</label>
+              <label class="check-item"><input type="checkbox" value="Frenos" /> Frenos</label>
+              <label class="check-item"><input type="checkbox" value="TPMS (Llantas)" /> TPMS</label>
+              <label class="check-item"><input type="checkbox" value="Ninguno" /> Ninguno</label>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="recAutorizaRuta">¿Cliente autoriza prueba de ruta inicial?</label>
+              <select id="recAutorizaRuta" onchange="toggleMotivosNoAplica()">
+                <option value="No aplica">No aplica</option>
+                <option value="Sí autoriza">Sí autoriza</option>
+                <option value="No autoriza">No autoriza</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="recObsRutaIni">Observaciones de prueba de ruta inicial</label>
+              <input id="recObsRutaIni" type="text" placeholder="Ruidos, vibraciones o comportamiento" />
+              <div id="motivosNoAplicaBox" class="chips-motivo">
+                <button type="button" class="chip-motivo" onclick="aplicarMotivoNoAplica('Llega en grúa')">Llega en grúa</button>
+                <button type="button" class="chip-motivo" onclick="aplicarMotivoNoAplica('Vehículo no enciende')">Vehículo no enciende</button>
+                <button type="button" class="chip-motivo" onclick="aplicarMotivoNoAplica('Falla crítica de frenos o transmisión')">Falla crítica de frenos/transmisión</button>
+                <button type="button" class="chip-motivo" onclick="aplicarMotivoNoAplica('Sin matrícula o no apto para circular')">Sin matrícula / no circular</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOTO DEL VEHÍCULO -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">📷 Foto del vehículo</h2>
+        </div>
+        <div class="form-group">
+          <label for="recFotoVehiculoInput">Tomar o seleccionar foto del vehículo</label>
+          <input id="recFotoVehiculoInput" type="file" accept="image/*" capture="environment" onchange="procesarFotoVehiculo(event)" />
+          <div class="foto-principal-box" id="prevFotoVehiculo">Sin foto del vehículo</div>
+        </div>
+      </div>
+
+      <!-- INSPECCIÓN VISUAL: SIN NOVEDAD / NOVEDAD -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">🔍 Inspección visual</h2>
+        </div>
+
+        <div class="form-group">
+          <label for="recInspeccionVisual">Estado en inspección visual</label>
+          <select id="recInspeccionVisual" onchange="toggleBloqueNovedad()">
+            <option value="Sin novedad" selected>Sin novedad</option>
+            <option value="Novedad">Novedad</option>
+          </select>
+        </div>
+
+        <div id="bloqueNovedadDetalles" style="display:none;">
+          <div class="form-group">
+            <label for="recFotosNovedadInput">📸 Tomar / seleccionar fotos de novedad (abolladura, rayón o espejo roto)</label>
+            <input id="recFotosNovedadInput" type="file" accept="image/*" capture="environment" multiple onchange="procesarFotosNovedad(event)" />
+            <div class="hint-status">Al tocar una foto se crea un pin con su propio campo de descripción exclusivo.</div>
+          </div>
+
+          <div id="contenedorFotosNovedadRec" class="novedad-fotos-grid"></div>
+          <div id="listaPinesNovedadRec" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="form-group" style="margin-top:12px;">
+          <label>Lo que hay en el vehículo (herramientas y accesorios)</label>
+          <div class="grid-3" id="grupoInventario">
+            <label class="check-item"><input type="checkbox" value="Llanta de emergencia" /> Llanta emergencia</label>
+            <label class="check-item"><input type="checkbox" value="Gata hidráulica/mecánica" /> Gata</label>
+            <label class="check-item"><input type="checkbox" value="Llave de ruedas" /> Llave ruedas</label>
+            <label class="check-item"><input type="checkbox" value="Triángulos / Botiquín" /> Triángulos/Botiquín</label>
+            <label class="check-item"><input type="checkbox" value="Extintor" /> Extintor</label>
+            <label class="check-item"><input type="checkbox" value="Radio / Pantalla" /> Radio/Pantalla</label>
+            <label class="check-item"><input type="checkbox" value="Documentos / Matrícula" /> Documentos</label>
+            <label class="check-item"><input type="checkbox" value="Tapa cubos / Aros" /> Tapa cubos</label>
+            <label class="check-item"><input type="checkbox" value="Sin objetos de valor" /> Sin obj. valor</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="recPertenenciasExtra">Otras pertenencias / observaciones del interior</label>
+          <input id="recPertenenciasExtra" type="text" placeholder="Ej. Cargador, herramientas propias, observación adicional" />
+        </div>
+
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary" onclick="guardarRecepcion()">Guardar e Ingresar a 3. Taller</button>
+          <button type="button" class="btn btn-success" onclick="enviarResumenSecretaria()">Enviar Resumen</button>
+          <button type="button" class="btn btn-light" onclick="limpiarFormularioRecepcion()">Limpiar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 3: TALLER -->
+    <section class="tab-content" id="tab-3" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">🔧 Vehículos en Taller (Tiempo automático)</h2>
+          <button type="button" class="btn btn-light" onclick="sincronizarDesdeNube(true)">🔄 Actualizar</button>
+        </div>
+        <div id="contenedorTaller"></div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 4: ENTREGA -->
+    <section class="tab-content" id="tab-4" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">✅ Entrega, Servicios, Prueba Final, PDF y Envío</h2>
+          <button type="button" class="btn btn-light" onclick="sincronizarDesdeNube(true)">🔄 Actualizar</button>
+        </div>
+
+        <div id="contenedorPendientesEntrega" style="margin-bottom: 14px;"></div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="entCedula">Cédula del cliente</label>
+            <input id="entCedula" type="text" oninput="renderInformeEntrega()" />
+          </div>
+          <div class="form-group">
+            <label for="entCliente">Nombre del cliente</label>
+            <input id="entCliente" type="text" oninput="renderInformeEntrega()" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="entWhatsapp">WhatsApp registrado del cliente</label>
+            <input id="entWhatsapp" type="tel" oninput="renderInformeEntrega()" />
+          </div>
+          <div class="form-group">
+            <label for="entEmail">Email registrado del cliente (opcional)</label>
+            <input id="entEmail" type="email" oninput="renderInformeEntrega()" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="entWhatsappNuevo">Nuevo WhatsApp (opcional para envío de PDF)</label>
+            <input id="entWhatsappNuevo" type="tel" placeholder="Ej. 0987654321" oninput="renderInformeEntrega()" />
+          </div>
+          <div class="form-group">
+            <label for="entEmailNuevo">Nuevo Email (opcional para envío de PDF)</label>
+            <input id="entEmailNuevo" type="email" placeholder="Ej. otro@correo.com" oninput="renderInformeEntrega()" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="entPlaca">Placa</label>
+            <input id="entPlaca" type="text" oninput="this.value=this.value.toUpperCase(); renderInformeEntrega()" />
+          </div>
+          <div class="form-group">
+            <label for="entVehiculo">Vehículo (Marca/Modelo/Año)</label>
+            <input id="entVehiculo" type="text" oninput="renderInformeEntrega()" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="entAsesor">Asesor / Técnico que receptó el vehículo</label>
+          <input id="entAsesor" type="text" oninput="renderInformeEntrega()" />
+        </div>
+
+        <div class="form-group">
+          <label for="entFalla">Motivo de ingreso / falla reportada</label>
+          <textarea id="entFalla" rows="2" oninput="renderInformeEntrega()"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="entTrabajos">Trabajo realizado</label>
+          <textarea id="entTrabajos" rows="3" oninput="renderInformeEntrega()"></textarea>
+        </div>
+
+        <!-- ESTADO EN QUE SE ENTREGA Y PRUEBA FINAL -->
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="entEstadoVehiculo">Estado en que se entrega el vehículo</label>
+            <select id="entEstadoVehiculo" onchange="renderInformeEntrega()">
+              <option value="Operativo y listo para circular">Operativo y listo para circular</option>
+              <option value="Operativo con observaciones pendientes">Operativo con observaciones pendientes</option>
+              <option value="Requiere seguimiento / repuesto pendiente">Requiere seguimiento / repuesto pendiente</option>
+              <option value="En prueba final">En prueba final</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="entPruebaFinal">Prueba de ruta final</label>
+            <select id="entPruebaFinal" onchange="renderInformeEntrega()">
+              <option value="Aprobada sin novedades">Aprobada sin novedades</option>
+              <option value="Aprobada con observaciones">Aprobada con observaciones</option>
+              <option value="No realizada / no aplica">No realizada / no aplica</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="entObsPruebaFinal">Observaciones de estado de entrega y prueba final</label>
+          <input id="entObsPruebaFinal" type="text" placeholder="Ej. Sin ruidos, frenos firmes, temperatura estable, testigos apagados" oninput="renderInformeEntrega()" />
+        </div>
+
+        <!-- SERVICIOS: CANTIDAD + SERVICIO + PRECIO -->
+        <div class="form-group">
+          <label>🛠️ Servicios realizados (Cantidad · Servicio · Precio)</label>
+          <div class="servicio-fila-form">
+            <input id="srvCant" type="number" min="1" step="1" value="1" placeholder="Cant." />
+            <input id="srvNombre" type="text" placeholder="Servicio realizado (ej. Cambio de aceite, Frenos, Escaneo)" />
+            <input id="srvPrecio" type="number" min="0" step="0.01" placeholder="Precio ($)" />
+            <button type="button" class="btn btn-primary" onclick="agregarServicio()">+ Agregar</button>
+          </div>
+          <div id="listaServiciosUI"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="entFormaPago">Forma de pago</label>
+          <select id="entFormaPago" onchange="renderInformeEntrega()">
+            <option value="Efectivo">Efectivo</option>
+            <option value="Transferencia">Transferencia</option>
+          </select>
+        </div>
+
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary" onclick="cerrarOrdenYMostrarEnvio()">Cerrar Orden</button>
+        </div>
+
+        <div id="bloqueEnvioPostCierre" class="btn-group" style="display:none;">
+          <button type="button" class="btn btn-success" onclick="enviarPDFWhatsApp()">WhatsApp</button>
+          <button type="button" class="btn btn-warning" id="btnEntEmail" onclick="enviarPDFEmail()" style="display:none;">Email</button>
+          <button type="button" class="btn btn-light" onclick="descargarPDFDirecto()">Descargar PDF</button>
+        </div>
+
+        <div id="avisoEnvioPDF" class="hint-status" style="margin-top:8px;"></div>
+
+        <!-- PREVISUALIZACIÓN DEL INFORME PDF VERTICAL -->
+        <div class="form-group" style="margin-top: 14px;">
+          <label>Previsualización del Informe Final (PDF Vertical)</label>
+          <div class="pdf-sheet" id="areaImpresionPDF">
+            <div class="pdf-top">
+              <img class="logo-img" src="icon-512.jpg" alt="Logo Taller" onerror="this.style.display='none'" />
+              <div>
+                <h3 class="pdf-title" id="pdfTituloTaller">CLICK AUTO - SERVICIO AUTOMOTRIZ</h3>
+                <div class="pdf-sub" id="pdfSubTaller">Av. 11 de Noviembre y Eduardo Kingman · 0998415827</div>
+                <div class="pdf-sub" style="font-weight:700; color:var(--color-primario);">INFORME TÉCNICO DE RECEPCIÓN Y ENTREGA</div>
+              </div>
+            </div>
+
+            <!-- FOTO DEL VEHÍCULO + CLIENTE A UN LADO + VEHÍCULO AL OTRO LADO -->
+            <div class="pdf-hero-grid">
+              <div>
+                <div class="pdf-box-title">Foto del vehículo</div>
+                <div class="pdf-auto-foto" id="pdfFotoAuto">Sin foto del vehículo</div>
+              </div>
+              <div class="pdf-box" id="pdfBloqueCliente"></div>
+              <div class="pdf-box" id="pdfBloqueVehiculo"></div>
+            </div>
+
+            <!-- ORDEN DE TRABAJO Y DEBAJO ASESOR/TÉCNICO CENTRADOS (SOLO ETIQUETAS EN NEGRITA) -->
+            <div class="pdf-center-banner" id="pdfBannerOtAsesor"></div>
+
+            <!-- TIEMPOS -->
+            <div class="pdf-sec-title">Fechas y tiempos</div>
+            <div class="pdf-times-grid" id="pdfBloqueTiempos"></div>
+
+            <!-- MOTIVO / FALLA Y TRABAJO REALIZADO -->
+            <div class="pdf-sec-title">Motivo de ingreso y trabajo realizado</div>
+            <div class="pdf-box" id="pdfBloqueDiagnostico"></div>
+
+            <!-- ESTADO DE ENTREGA Y PRUEBA FINAL -->
+            <div class="pdf-sec-title">Estado de entrega y prueba final</div>
+            <div class="pdf-box" id="pdfBloqueEntregaPrueba"></div>
+
+            <!-- SERVICIOS Y PRECIOS -->
+            <div class="pdf-sec-title">Servicios realizados y precios</div>
+            <table class="pdf-table">
+              <thead>
+                <tr>
+                  <th style="width:65px;">Cant.</th>
+                  <th>Servicio</th>
+                  <th class="num">P. Unit.</th>
+                  <th class="num">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody id="pdfCuerpoServicios"></tbody>
+            </table>
+
+            <!-- AL FINAL: INSPECCIÓN VISUAL, PINES CON DESCRIPCIÓN INDIVIDUAL Y FOTOS DE NOVEDAD -->
+            <div class="pdf-sec-title">Inspección visual y novedades con pines</div>
+            <div class="pdf-box" id="pdfBloqueInspeccionFinal"></div>
+            <div id="galeriaNovedadPdf" class="novedad-fotos-grid"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 5: HISTORIAL -->
+    <section class="tab-content" id="tab-5" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">🗂️ Historial de Vehículos Atendidos</h2>
+          <button type="button" class="btn btn-light" onclick="sincronizarDesdeNube(true)">🔄 Actualizar</button>
+        </div>
+        <div id="contenedorHistorial"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODAL CONFIGURACIÓN -->
+  <div class="modal-overlay" id="modalConfig">
+    <div class="modal-card">
+      <div class="card-header">
+        <h2 class="card-title">⚙️ Configuración del Taller</h2>
+        <button type="button" class="btn btn-light" onclick="cerrarConfig()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label for="cfgTallerNombre">Nombre del taller</label>
+        <input id="cfgTallerNombre" type="text" />
+      </div>
+
+      <div class="form-group">
+        <label for="cfgTallerSub">Dirección y teléfono</label>
+        <input id="cfgTallerSub" type="text" />
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="cfgColorPrimario">Color principal del taller</label>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input id="cfgColorPrimario" type="color" value="#1976d2" />
+            <span id="cfgColorHex" style="font-size:12.5px; font-family:monospace;">#1976d2</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="cfgLogoInput">Logo del taller</label>
+          <input id="cfgLogoInput" type="file" accept="image/*" onchange="procesarLogoConfig(event)" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Vista previa del logo</label>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <img id="cfgLogoPreview" class="logo-img" src="icon-512.jpg" alt="Logo" style="width:48px; height:48px; border-radius:8px; border:1px solid #cbd5e1; object-fit:cover;" onerror="this.style.display='none'" />
+          <button type="button" class="btn btn-light" onclick="restablecerLogoDefecto()">Restablecer logo por defecto</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="cfgSecretariaWa">WhatsApp de Secretaría</label>
+        <input id="cfgSecretariaWa" type="tel" placeholder="0998415827" />
+      </div>
+
+      <div class="form-group">
+        <label for="cfgAsesores">Lista de Asesores / Técnicos (uno por línea)</label>
+        <textarea id="cfgAsesores" rows="4" placeholder="Ej.&#10;Carlos Pérez&#10;Juan Gómez"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="cfgPortalPlaca">Enlace de consulta de Placa</label>
+        <input id="cfgPortalPlaca" type="url" />
+      </div>
+
+      <div class="form-group">
+        <label for="cfgPortalCedula">Enlace de consulta de Cédula</label>
+        <input id="cfgPortalCedula" type="url" />
+      </div>
+
+      <!-- SINCRONIZACIÓN ENTRE CELULAR Y PC -->
+      <div class="form-group" style="border-top:1px solid var(--borde); padding-top:12px;">
+        <label for="cfgFirebaseUrl">URL de sincronización Firebase (para compartir órdenes entre celular y PC)</label>
+        <input id="cfgFirebaseUrl" type="url" placeholder="https://tu-proyecto-default-rtdb.firebaseio.com" />
+        <div class="hint-status" id="infoLinkCompartir"></div>
+      </div>
+
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary" onclick="guardarConfig()">Guardar Configuración</button>
+        <button type="button" class="btn btn-light" onclick="copiarLinkSincronizado()">🔗 Copiar Link para PC / Secretaría</button>
+        <button type="button" class="btn btn-light" onclick="cerrarConfig()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const CANAL_TALLER = (urlParams.get("taller") || "clickauto").replace(/[^a-zA-Z0-9_-]/g, "") || "clickauto";
+    const ORDEN_URL_ID = urlParams.get("orden") || "";
+    const FB_URL_PARAM = urlParams.get("fb") || "";
+
+    const KEY_CFG = "clickauto_cfg_v28_" + CANAL_TALLER;
+    const KEY_ORD = "clickauto_ordenes_v28_" + CANAL_TALLER;
+    const KEY_CACHE_CED = "clickauto_cache_cedulas_v28_" + CANAL_TALLER;
+    const KEY_CACHE_PLC = "clickauto_cache_placas_v28_" + CANAL_TALLER;
+
+    const DEFAULT_CFG = {
+      nombreTaller: "CLICK AUTO - SERVICIO AUTOMOTRIZ",
+      subtitulo: "Av. 11 de Noviembre y Eduardo Kingman · 0998415827",
+      colorPrimario: "#1976d2",
+      logoData: "icon-512.jpg",
+      secretariaWa: "0998415827",
+      codigoPais: "593",
+      asesores: ["Asesor / Técnico 1", "Asesor / Técnico 2"],
+      portalPlaca: "https://servicios.axiscloud.ec/CRV/?ps_empresa=02#",
+      portalCedula: "https://www.ecuadorlegalonline.com/consultas/registro-civil/consultar-el-nombre-con-el-numero-de-cedula/",
+      firebaseUrl: "https://click-auto-a75c1-default-rtdb.firebaseio.com"
+    };
+
+    let cfg = loadCfg();
+    if (FB_URL_PARAM && !cfg.firebaseUrl) {
+      cfg.firebaseUrl = FB_URL_PARAM.replace(/\/+$/, "");
+      saveCfg(false);
+    }
+
+    let ordenes = loadOrdenes();
+    let ordenSeleccionadaId = null;
+
+    let fotoVehiculoActual = "";
+    let fotosNovedadActual = [];
+    let serviciosActuales = [];
+    let logoTemporalCfg = null;
+
+    let recSegs = 0;
+    let recTimer = null;
+
+    let entInicioMs = null;
+    let entTimer = null;
+
+    function loadCfg() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(KEY_CFG)) || {};
+        return {
+          ...DEFAULT_CFG,
+          ...saved,
+          asesores: Array.isArray(saved.asesores) && saved.asesores.length ? saved.asesores : DEFAULT_CFG.asesores
+        };
+      } catch (e) {
+        return { ...DEFAULT_CFG };
+      }
+    }
+
+    function saveCfg(subirNube) {
+      try { localStorage.setItem(KEY_CFG, JSON.stringify(cfg)); } catch (e) {}
+      if (subirNube !== false) sincronizarHaciaNube();
+    }
+
+    function loadOrdenes() {
+      try {
+        const arr = JSON.parse(localStorage.getItem(KEY_ORD)) || [];
+        return Array.isArray(arr) ? arr : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveOrdenes(subirNube) {
+      try { localStorage.setItem(KEY_ORD, JSON.stringify(ordenes)); } catch (e) {}
+      renderTodo();
+      if (subirNube !== false) sincronizarHaciaNube();
+    }
+
+    function leerCache(clave) {
+      try { return JSON.parse(localStorage.getItem(clave)) || {}; } catch (e) { return {}; }
+    }
+
+    function guardarCache(clave, data) {
+      try { localStorage.setItem(clave, JSON.stringify(data)); } catch (e) {}
+    }
+
+    /* SINCRONIZACIÓN ENTRE CELULAR Y PC */
+    function obtenerEndpointNube() {
+      const base = (cfg.firebaseUrl || "").trim().replace(/\/+$/, "");
+      if (!base) return "";
+      return base + "/taller_" + CANAL_TALLER + ".json";
+    }
+
+    function construirEnlaceCompartible(ordenId) {
+      const url = new URL(window.location.href.split("?")[0]);
+      if (ordenId) url.searchParams.set("orden", ordenId);
+      return url.toString();
+    }
+
+    function actualizarBadgeSync(texto) {
+      const el = document.getElementById("badgeSyncEstado");
+      if (el) el.textContent = texto;
+    }
+
+    async function sincronizarHaciaNube() {
+      const endpoint = obtenerEndpointNube();
+      if (!endpoint) return;
+      try {
+        actualizarBadgeSync("↻ Sincronizando...");
+        const payload = {
+          updatedAt: Date.now(),
+          ordenes: ordenes,
+          cfg: {
+            nombreTaller: cfg.nombreTaller,
+            subtitulo: cfg.subtitulo,
+            colorPrimario: cfg.colorPrimario,
+            secretariaWa: cfg.secretariaWa,
+            asesores: cfg.asesores,
+            portalPlaca: cfg.portalPlaca,
+            portalCedula: cfg.portalCedula
+          }
+        };
+        const res = await fetch(endpoint, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        actualizarBadgeSync(res.ok ? "● Sincronizado" : "● Local");
+      } catch (e) {
+        actualizarBadgeSync("● Local");
+      }
+    }
+
+    async function sincronizarDesdeNube(abrirOrdenUrl) {
+      const endpoint = obtenerEndpointNube();
+      if (!endpoint) {
+        actualizarBadgeSync("● Activo");
+        if (abrirOrdenUrl && ORDEN_URL_ID) irATab(3);
+        return;
+      }
+      try {
+        actualizarBadgeSync("↻ Cargando...");
+        const res = await fetch(endpoint, { cache: "no-store" });
+        if (!res.ok) {
+          actualizarBadgeSync("● Local");
+          return;
+        }
+        const data = await res.json();
+        if (data && Array.isArray(data.ordenes)) {
+          ordenes = data.ordenes;
+          try { localStorage.setItem(KEY_ORD, JSON.stringify(ordenes)); } catch (e) {}
+        }
+        if (data && data.cfg) {
+          cfg = Object.assign({}, cfg, data.cfg);
+          try { localStorage.setItem(KEY_CFG, JSON.stringify(cfg)); } catch (e) {}
+          aplicarCfgUI();
+        }
+        renderTodo();
+
+        if (ordenSeleccionadaId) {
+          const existe = ordenes.find(function (o) { return o.id === ordenSeleccionadaId; });
+          if (existe) cargarOrdenPorId(ordenSeleccionadaId, false);
+        } else if (abrirOrdenUrl && ORDEN_URL_ID) {
+          const encontrada = ordenes.find(function (o) { return String(o.id) === String(ORDEN_URL_ID); });
+          if (encontrada) {
+            if (encontrada.estado === "taller") {
+              irATab(3);
+            } else {
+              cargarOrdenPorId(encontrada.id, true);
+            }
+          } else {
+            irATab(3);
+          }
+        }
+        actualizarBadgeSync("● Sincronizado");
+      } catch (e) {
+        actualizarBadgeSync("● Local");
+      }
+    }
+
+    function copiarLinkSincronizado() {
+      const link = construirEnlaceCompartible();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).then(function () {
+          alert("Enlace copiado:\n" + link);
+        }).catch(function () {
+          prompt("Copia este enlace para abrir en la PC:", link);
+        });
+      } else {
+        prompt("Copia este enlace para abrir en la PC:", link);
+      }
+    }
+
+    /* COLOR Y LOGO */
+    function ajustarTonoHex(hex, factor) {
+      const clean = (hex || "#1976d2").replace("#", "");
+      if (clean.length !== 6) return "#0d47a1";
+      const r = Math.max(0, Math.min(255, Math.round(parseInt(clean.slice(0, 2), 16) * factor)));
+      const g = Math.max(0, Math.min(255, Math.round(parseInt(clean.slice(2, 4), 16) * factor)));
+      const b = Math.max(0, Math.min(255, Math.round(parseInt(clean.slice(4, 6), 16) * factor)));
+      return "#" + [r, g, b].map(function (x) { return x.toString(16).padStart(2, "0"); }).join("");
+    }
+
+    function hexARgba(hex, alpha) {
+      const clean = (hex || "#1976d2").replace("#", "");
+      if (clean.length !== 6) return "rgba(25, 118, 210, " + alpha + ")";
+      const r = parseInt(clean.slice(0, 2), 16);
+      const g = parseInt(clean.slice(2, 4), 16);
+      const b = parseInt(clean.slice(4, 6), 16);
+      return "rgba(" + r + ", " + g + ", " + b + ", " + alpha + ")";
+    }
+
+    function aplicarTemaYLogo() {
+      const prim = cfg.colorPrimario || DEFAULT_CFG.colorPrimario;
+      const osc = ajustarTonoHex(prim, 0.65);
+      const suave = hexARgba(prim, 0.1);
+
+      document.documentElement.style.setProperty("--color-primario", prim);
+      document.documentElement.style.setProperty("--color-oscuro", osc);
+      document.documentElement.style.setProperty("--color-suave", suave);
+
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute("content", prim);
+
+      const srcLogo = cfg.logoData || DEFAULT_CFG.logoData;
+      document.querySelectorAll("img.logo-img").forEach(function (img) {
+        img.style.display = "";
+        img.src = srcLogo;
+      });
+    }
+
+    function procesarLogoConfig(event) {
+      const file = (event.target.files && event.target.files[0]) || null;
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          const canvas = document.createElement("canvas");
+          canvas.width = 256;
+          canvas.height = 256;
+          canvas.getContext("2d").drawImage(img, 0, 0, 256, 256);
+          logoTemporalCfg = canvas.toDataURL("image/png");
+          const prev = document.getElementById("cfgLogoPreview");
+          prev.style.display = "";
+          prev.src = logoTemporalCfg;
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function restablecerLogoDefecto() {
+      logoTemporalCfg = DEFAULT_CFG.logoData;
+      const prev = document.getElementById("cfgLogoPreview");
+      prev.style.display = "";
+      prev.src = logoTemporalCfg;
+    }
+
+    /* NAVEGACIÓN */
+    function irATab(num) {
+      const n = String(num);
+      document.querySelectorAll(".tab-content").forEach(function (el) {
+        const activo = el.id === "tab-" + n;
+        el.classList.toggle("active", activo);
+        el.style.display = activo ? "block" : "none";
+      });
+      document.querySelectorAll(".nav-tab").forEach(function (btn) {
+        btn.classList.toggle("active", btn.getAttribute("data-tab") === n);
+      });
+
+      if (n === "2") {
+        iniciarCronoRecepcion();
+        toggleBloqueFalla();
+        toggleBloqueNovedad();
+        toggleMotivosNoAplica();
+        actualizarBotonCedula();
+        actualizarBotonPlaca();
+      }
+      if (n === "4") {
+        if (!entInicioMs) entInicioMs = Date.now();
+        iniciarCronoEntregaSilencioso();
+        try { renderInformeEntrega(); } catch (e) {}
+      }
+    }
+
+    function iniciarNuevaRecepcionDesdeProtocolo() {
+      reiniciarCronoRecepcion();
+      irATab(2);
+    }
+
+    /* CONFIGURACIÓN */
+    function aplicarCfgUI() {
+      aplicarTemaYLogo();
+      document.getElementById("hdrNombreTaller").textContent = cfg.nombreTaller;
+      document.getElementById("hdrSubtitulo").textContent = cfg.subtitulo;
+      document.getElementById("pdfTituloTaller").textContent = cfg.nombreTaller;
+      document.getElementById("pdfSubTaller").textContent = cfg.subtitulo;
+      const sel = document.getElementById("recAsesorSelect");
+      sel.innerHTML = cfg.asesores.map(function (a) {
+        return '<option value="' + escapeAttr(a) + '">' + escapeHtml(a) + '</option>';
+      }).join("");
+    }
+
+    function abrirConfig() {
+      logoTemporalCfg = null;
+      document.getElementById("cfgTallerNombre").value = cfg.nombreTaller || "";
+      document.getElementById("cfgTallerSub").value = cfg.subtitulo || "";
+      const col = cfg.colorPrimario || DEFAULT_CFG.colorPrimario;
+      document.getElementById("cfgColorPrimario").value = col;
+      document.getElementById("cfgColorHex").textContent = col;
+      document.getElementById("cfgColorPrimario").oninput = function () {
+        document.getElementById("cfgColorHex").textContent = this.value;
+      };
+      const prev = document.getElementById("cfgLogoPreview");
+      prev.style.display = "";
+      prev.src = cfg.logoData || DEFAULT_CFG.logoData;
+      document.getElementById("cfgLogoInput").value = "";
+      document.getElementById("cfgSecretariaWa").value = cfg.secretariaWa || "";
+      document.getElementById("cfgAsesores").value = (cfg.asesores || []).join("\n");
+      document.getElementById("cfgPortalPlaca").value = cfg.portalPlaca || "";
+      document.getElementById("cfgPortalCedula").value = cfg.portalCedula || "";
+      document.getElementById("cfgFirebaseUrl").value = cfg.firebaseUrl || "";
+      document.getElementById("infoLinkCompartir").textContent = "Enlace sincronizado: " + construirEnlaceCompartible();
+      document.getElementById("modalConfig").classList.add("open");
+    }
+
+    function cerrarConfig() {
+      document.getElementById("modalConfig").classList.remove("open");
+    }
+
+    function guardarConfig() {
+      cfg.nombreTaller = document.getElementById("cfgTallerNombre").value.trim() || DEFAULT_CFG.nombreTaller;
+      cfg.subtitulo = document.getElementById("cfgTallerSub").value.trim() || DEFAULT_CFG.subtitulo;
+      cfg.colorPrimario = document.getElementById("cfgColorPrimario").value || DEFAULT_CFG.colorPrimario;
+      if (logoTemporalCfg) cfg.logoData = logoTemporalCfg;
+      cfg.secretariaWa = document.getElementById("cfgSecretariaWa").value.trim();
+      const lista = document.getElementById("cfgAsesores").value
+        .split("\n").map(function (x) { return x.trim(); }).filter(Boolean);
+      cfg.asesores = lista.length ? lista : DEFAULT_CFG.asesores;
+      cfg.portalPlaca = document.getElementById("cfgPortalPlaca").value.trim() || DEFAULT_CFG.portalPlaca;
+      cfg.portalCedula = document.getElementById("cfgPortalCedula").value.trim() || DEFAULT_CFG.portalCedula;
+      cfg.firebaseUrl = document.getElementById("cfgFirebaseUrl").value.trim().replace(/\/+$/, "");
+      saveCfg(true);
+      aplicarCfgUI();
+      renderInformeEntrega();
+      cerrarConfig();
+    }
+
+    /* UTILIDADES */
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function escapeAttr(str) { return escapeHtml(str).replace(/'/g, "&#39;"); }
+    function limpiarCed(v) { return (v || "").replace(/\D/g, "").trim(); }
+    function limpiarPlc(v) { return (v || "").toUpperCase().replace(/[^A-Z0-9-]/g, "").trim(); }
+    function limpiarPlcRaw(v) { return (v || "").toUpperCase().replace(/[^A-Z0-9]/g, "").trim(); }
+    function ahoraISO() { return new Date().toISOString(); }
+
+    function fmtFecha(val) {
+      if (!val) return "No registrada";
+      const d = new Date(val);
+      if (isNaN(d.getTime())) return val;
+      return d.toLocaleString("es-EC", {
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit"
+      });
+    }
+
+    function fmtSeg(s) {
+      const hh = String(Math.floor(s / 3600)).padStart(2, "0");
+      const mm = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+      const ss = String(s % 60).padStart(2, "0");
+      return hh + ":" + mm + ":" + ss;
+    }
+
+    function fmtPrecio(n) { return "$" + Number(n || 0).toFixed(2); }
+
+    function fmtWa(tel) {
+      let d = (tel || "").replace(/\D/g, "");
+      if (!d) return "";
+      if (d.startsWith("00")) d = d.slice(2);
+      if (d.startsWith("0")) d = cfg.codigoPais + d.slice(1);
+      else if (d.length === 9) d = cfg.codigoPais + d;
+      return d;
+    }
+
+    function obtenerChecks(id) {
+      return Array.from(document.querySelectorAll("#" + id + " input[type='checkbox']:checked"))
+        .map(function (c) { return c.value; });
+    }
+
+    function limpiarChecks(id) {
+      document.querySelectorAll("#" + id + " input[type='checkbox']").forEach(function (c) { c.checked = false; });
+    }
+
+    function combinarInventarioYExtra(inventario, extra) {
+      const partes = [];
+      if (inventario) partes.push(inventario);
+      if (extra) partes.push(extra);
+      return partes.length ? partes.join(" · ") : "No detallado";
+    }
+
+    /* MEMORIA LOCAL + BOTÓN DINÁMICO AL COMPLETAR CÉDULA / PLACA */
+    function actualizarBotonCedula() {
+      const ced = limpiarCed(document.getElementById("recCedula").value);
+      const btn = document.getElementById("btnPortalCedula");
+      if (btn) btn.classList.toggle("visible", ced.length >= 10);
+    }
+
+    function actualizarBotonPlaca() {
+      const plcRaw = limpiarPlcRaw(document.getElementById("recPlaca").value);
+      const btn = document.getElementById("btnPortalPlaca");
+      if (btn) btn.classList.toggle("visible", plcRaw.length >= 6);
+    }
+
+    function guardarNombreLocal(ced, nombre) {
+      if (!ced || !nombre) return;
+      const c = leerCache(KEY_CACHE_CED);
+      c[ced] = nombre;
+      guardarCache(KEY_CACHE_CED, c);
+    }
+
+    function guardarVehiculoLocal(plcRaw, vehiculo) {
+      if (!plcRaw || !vehiculo) return;
+      const p = leerCache(KEY_CACHE_PLC);
+      p[plcRaw] = vehiculo;
+      guardarCache(KEY_CACHE_PLC, p);
+    }
+
+    function autocompletarClienteLocal() {
+      const ced = limpiarCed(document.getElementById("recCedula").value);
+      const st = document.getElementById("estadoCedula");
+      if (!ced) { st.textContent = ""; return; }
+      const cache = leerCache(KEY_CACHE_CED);
+      if (cache[ced]) {
+        document.getElementById("recCliente").value = cache[ced];
+        st.textContent = "✓ Cliente guardado anteriormente";
+      } else { st.textContent = ""; }
+    }
+
+    function autocompletarVehiculoLocal() {
+      const plcRaw = limpiarPlcRaw(document.getElementById("recPlaca").value);
+      const st = document.getElementById("estadoPlaca");
+      if (!plcRaw) { st.textContent = ""; return; }
+      const cache = leerCache(KEY_CACHE_PLC);
+      if (cache[plcRaw]) {
+        document.getElementById("recVehiculo").value = cache[plcRaw];
+        st.textContent = "✓ Vehículo guardado anteriormente";
+      } else { st.textContent = ""; }
+    }
+
+    function abrirPortalCedula() {
+      window.open(cfg.portalCedula || DEFAULT_CFG.portalCedula, "_blank", "noopener,noreferrer");
+    }
+
+    function abrirPortalPlaca() {
+      window.open(cfg.portalPlaca || DEFAULT_CFG.portalPlaca, "_blank", "noopener,noreferrer");
+    }
+
+    function guardarEnCacheLocal(d) {
+      if (d.cedula && d.cliente) guardarNombreLocal(d.cedula, d.cliente);
+      const plcRaw = limpiarPlcRaw(d.placa);
+      if (plcRaw && d.vehiculo) guardarVehiculoLocal(plcRaw, d.vehiculo);
+    }
+
+    /* DESGLOSE: MANTENIMIENTO PREVENTIVO vs FALLA */
+    function toggleBloqueFalla() {
+      const tipo = document.getElementById("recTipoIngreso").value;
+      const bloque = document.getElementById("bloqueFallaDetalles");
+      const esFalla = tipo === "Falla / Diagnóstico";
+      bloque.style.display = esFalla ? "block" : "none";
+      if (!esFalla) {
+        document.getElementById("recFalla").value = "";
+        document.getElementById("recObsRutaIni").value = "";
+        document.getElementById("recAutorizaRuta").value = "No aplica";
+        limpiarChecks("grupoTestigos");
+      }
+    }
+
+    /* PRUEBA DE RUTA: OPCIONES CUANDO ES "NO APLICA" */
+    function toggleMotivosNoAplica() {
+      const sel = document.getElementById("recAutorizaRuta");
+      const box = document.getElementById("motivosNoAplicaBox");
+      if (!sel || !box) return;
+      box.style.display = sel.value === "No aplica" ? "flex" : "none";
+    }
+
+    function aplicarMotivoNoAplica(motivo) {
+      const obs = document.getElementById("recObsRutaIni");
+      if (!obs) return;
+      const actual = obs.value.trim();
+      if (!actual) {
+        obs.value = motivo;
+      } else if (!actual.toLowerCase().includes(motivo.toLowerCase())) {
+        obs.value = actual + " · " + motivo;
+      }
+    }
+
+    /* CRONÓMETROS */
+    function iniciarCronoRecepcion() {
+      if (recTimer) return;
+      recTimer = setInterval(function () {
+        recSegs++;
+        document.getElementById("cronoRecepcionTxt").textContent = fmtSeg(recSegs);
+      }, 1000);
+    }
+
+    function pausarCronoRecepcion() {
+      clearInterval(recTimer);
+      recTimer = null;
+    }
+
+    function reiniciarCronoRecepcion() {
+      pausarCronoRecepcion();
+      recSegs = 0;
+      document.getElementById("cronoRecepcionTxt").textContent = "00:00:00";
+      iniciarCronoRecepcion();
+    }
+
+    function iniciarCronoEntregaSilencioso() {
+      if (entTimer) return;
+      entTimer = setInterval(function () {
+        const tab4 = document.getElementById("tab-4");
+        if (tab4 && tab4.style.display === "block") renderInformeEntrega();
+      }, 1000);
+    }
+
+    /* FOTO DEL VEHÍCULO */
+    function comprimirImagen(file, maxW, quality, cb) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          const canvas = document.createElement("canvas");
+          const scale = img.width > maxW ? maxW / img.width : 1;
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+          cb(canvas.toDataURL("image/jpeg", quality));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function procesarFotoVehiculo(event) {
+      const file = (event.target.files && event.target.files[0]) || null;
+      if (!file) return;
+      comprimirImagen(file, 720, 0.7, function (dataUrl) {
+        fotoVehiculoActual = dataUrl;
+        renderFotoVehiculoRec();
+      });
+    }
+
+    function renderFotoVehiculoRec() {
+      const box = document.getElementById("prevFotoVehiculo");
+      box.innerHTML = fotoVehiculoActual
+        ? '<img src="' + fotoVehiculoActual + '" alt="Foto del vehículo" />'
+        : "Sin foto del vehículo";
+    }
+
+    /* INSPECCIÓN VISUAL (SIN NOVEDAD / NOVEDAD) + FOTOS CON PINES EXCLUSIVOS */
+    function toggleBloqueNovedad() {
+      const estado = document.getElementById("recInspeccionVisual").value;
+      const bloque = document.getElementById("bloqueNovedadDetalles");
+      const esNovedad = estado === "Novedad";
+      bloque.style.display = esNovedad ? "block" : "none";
+      if (!esNovedad) {
+        fotosNovedadActual = [];
+        const inpEl = document.getElementById("recFotosNovedadInput");
+        if (inpEl) inpEl.value = "";
+        renderFotosNovedadRec();
+      }
+    }
+
+    function renumerarPinesNovedad() {
+      let n = 1;
+      fotosNovedadActual.forEach(function (f) {
+        (f.pines || []).forEach(function (p) {
+          p.num = n++;
+        });
+      });
+    }
+
+    function procesarFotosNovedad(event) {
+      const files = Array.from(event.target.files || []);
+      files.forEach(function (file) {
+        comprimirImagen(file, 720, 0.65, function (dataUrl) {
+          fotosNovedadActual.push({
+            id: String(Date.now()) + "_" + Math.random().toString(36).slice(2, 6),
+            src: dataUrl,
+            pines: []
+          });
+          renumerarPinesNovedad();
+          renderFotosNovedadRec();
+        });
+      });
+    }
+
+    function colocarPinEnFotoNovedad(event, fotoIdx) {
+      const foto = fotosNovedadActual[fotoIdx];
+      if (!foto) return;
+      const lienzo = event.currentTarget;
+      const rect = lienzo.getBoundingClientRect();
+      const xPct = Math.max(5, Math.min(95, ((event.clientX - rect.left) / rect.width) * 100));
+      const yPct = Math.max(10, Math.min(95, ((event.clientY - rect.top) / rect.height) * 100));
+
+      foto.pines.push({
+        num: 0,
+        x: Number(xPct.toFixed(1)),
+        y: Number(yPct.toFixed(1)),
+        desc: ""
+      });
+      renumerarPinesNovedad();
+      renderFotosNovedadRec();
+
+      const nuevoNum = foto.pines[foto.pines.length - 1].num;
+      const inputPin = document.getElementById("pin-desc-input-" + nuevoNum);
+      if (inputPin) inputPin.focus();
+    }
+
+    function actualizarDescPin(fotoIdx, pinIdx, valor) {
+      const foto = fotosNovedadActual[fotoIdx];
+      if (!foto || !foto.pines || !foto.pines[pinIdx]) return;
+      foto.pines[pinIdx].desc = valor;
+    }
+
+    function eliminarPinDeFoto(fotoIdx, pinIdx) {
+      const foto = fotosNovedadActual[fotoIdx];
+      if (!foto) return;
+      foto.pines.splice(pinIdx, 1);
+      renumerarPinesNovedad();
+      renderFotosNovedadRec();
+    }
+
+    function eliminarFotoNovedad(fotoIdx) {
+      fotosNovedadActual.splice(fotoIdx, 1);
+      renumerarPinesNovedad();
+      renderFotosNovedadRec();
+    }
+
+    function renderHtmlFotosNovedad(fotos, interactivo) {
+      return (fotos || []).map(function (f, fIdx) {
+        const pinesHtml = (f.pines || []).map(function (p) {
+          return '<div class="pin-marker" style="left:' + p.x + '%; top:' + p.y + '%;">' + p.num + '</div>';
+        }).join("");
+        const btnDel = interactivo
+          ? '<button type="button" class="foto-del" title="Eliminar foto" onclick="event.stopPropagation(); eliminarFotoNovedad(' + fIdx + ')">×</button>'
+          : '';
+        const attrClick = interactivo
+          ? ' onclick="colocarPinEnFotoNovedad(event, ' + fIdx + ')"'
+          : '';
+        const countTxt = (f.pines || []).length
+          ? 'Pines: ' + f.pines.map(function (p) { return '#' + p.num; }).join(", ")
+          : (interactivo ? 'Toca la foto para crear un pin y su descripción' : 'Sin pines en esta foto');
+
+        return (
+          '<div class="novedad-foto-card">' +
+            '<div class="novedad-lienzo"' + attrClick + '>' +
+              '<img src="' + f.src + '" alt="Foto novedad ' + (fIdx + 1) + '" />' +
+              btnDel +
+              pinesHtml +
+            '</div>' +
+            '<div style="font-size:11.5px; color:#334155; font-weight:700; margin-top:6px;">Foto ' + (fIdx + 1) + ' · ' + escapeHtml(countTxt) + '</div>' +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    function renderFotosNovedadRec() {
+      const cont = document.getElementById("contenedorFotosNovedadRec");
+      if (cont) cont.innerHTML = renderHtmlFotosNovedad(fotosNovedadActual, true);
+
+      const list = document.getElementById("listaPinesNovedadRec");
+      if (list) {
+        const tarjetas = [];
+        fotosNovedadActual.forEach(function (f, fIdx) {
+          (f.pines || []).forEach(function (p, pIdx) {
+            tarjetas.push(
+              '<div class="pin-desc-card">' +
+                '<div class="pin-desc-header">' +
+                  '<span>Descripción exclusiva del Pin #' + p.num + ' (Foto ' + (fIdx + 1) + ')</span>' +
+                  '<button type="button" class="pin-desc-del" onclick="eliminarPinDeFoto(' + fIdx + ', ' + pIdx + ')">Eliminar pin</button>' +
+                '</div>' +
+                '<input id="pin-desc-input-' + p.num + '" type="text" value="' + escapeAttr(p.desc || "") + '" ' +
+                  'placeholder="Escribe qué hay exactamente en el Pin #' + p.num + ' (ej. abolladura, rayón, espejo roto)" ' +
+                  'oninput="actualizarDescPin(' + fIdx + ', ' + pIdx + ', this.value)" />' +
+              '</div>'
+            );
+          });
+        });
+        list.innerHTML = tarjetas.join("");
+      }
+    }
+
+    function obtenerResumenPines(fotos) {
+      const items = [];
+      (fotos || []).forEach(function (f, fIdx) {
+        (f.pines || []).forEach(function (p) {
+          items.push({
+            num: p.num,
+            fotoNum: fIdx + 1,
+            desc: (p.desc || "").trim() || "Sin descripción"
+          });
+        });
+      });
+      return items;
+    }
+
+    /* RECEPCIÓN Y SECRETARÍA */
+    function capturarDatosRecepcion() {
+      const tipoIngreso = document.getElementById("recTipoIngreso").value;
+      const esFalla = tipoIngreso === "Falla / Diagnóstico";
+      const testigos = esFalla ? obtenerChecks("grupoTestigos") : [];
+      const fallaDetalle = esFalla ? document.getElementById("recFalla").value.trim() : "";
+
+      const inventarioArr = obtenerChecks("grupoInventario");
+      const inventarioStr = inventarioArr.join(", ");
+      const pertenenciasExtra = document.getElementById("recPertenenciasExtra").value.trim();
+      const inspeccionVisual = document.getElementById("recInspeccionVisual").value;
+      const esNovedad = inspeccionVisual === "Novedad";
+      const fotosGuardadas = esNovedad ? JSON.parse(JSON.stringify(fotosNovedadActual)) : [];
+      const pinesInfo = esNovedad ? obtenerResumenPines(fotosGuardadas) : [];
+
+      return {
+        cedula: limpiarCed(document.getElementById("recCedula").value),
+        placa: limpiarPlc(document.getElementById("recPlaca").value),
+        ot: document.getElementById("recOt").value.trim(),
+        cliente: document.getElementById("recCliente").value.trim(),
+        whatsapp: document.getElementById("recWhatsapp").value.trim(),
+        email: document.getElementById("recEmail").value.trim(),
+        vehiculo: document.getElementById("recVehiculo").value.trim(),
+        km: document.getElementById("recKm").value.trim(),
+        combustible: document.getElementById("recCombustible").value,
+        asesor: document.getElementById("recAsesorSelect").value || "",
+        fechaRecibido: ahoraISO(),
+        tipoIngreso: tipoIngreso,
+        falla: esFalla ? (fallaDetalle || "Falla por diagnosticar") : "Mantenimiento preventivo",
+        testigos: esFalla ? (testigos.length ? testigos.join(", ") : "Ninguno") : "No aplica",
+        autorizaRuta: esFalla ? document.getElementById("recAutorizaRuta").value : "No aplica",
+        obsRutaIni: esFalla ? document.getElementById("recObsRutaIni").value.trim() : "",
+        inspeccionVisual: inspeccionVisual,
+        totalPinesNovedad: pinesInfo.length,
+        inventario: inventarioStr,
+        pertenenciasExtra: pertenenciasExtra,
+        loQueHayEnVehiculo: combinarInventarioYExtra(inventarioStr, pertenenciasExtra),
+        tiempoRecepcion: fmtSeg(recSegs),
+        fotoVehiculo: fotoVehiculoActual,
+        fotosNovedad: fotosGuardadas
+      };
+    }
+
+    function crearYGuardarOrdenDesdeRecepcion() {
+      const d = capturarDatosRecepcion();
+      if (!d.placa || !d.cliente || !d.whatsapp || !d.vehiculo) {
+        alert("Completa Placa, Cliente, Teléfono / WhatsApp y Vehículo.");
+        return null;
+      }
+
+      guardarEnCacheLocal(d);
+      pausarCronoRecepcion();
+
+      const nuevaOrden = {
+        id: String(Date.now()),
+        estado: "taller",
+        ...d,
+        tallerInicioMs: Date.now(),
+        tiempoTaller: "00:00:00",
+        fechaEntrega: "",
+        tiempoEntrega: "00:00:00",
+        trabajos: "",
+        estadoEntregaVehiculo: "Operativo y listo para circular",
+        pruebaFinal: "Aprobada sin novedades",
+        obsPruebaFinal: "",
+        formaPago: "Efectivo",
+        servicios: []
+      };
+
+      ordenes.unshift(nuevaOrden);
+      saveOrdenes(true);
+      return nuevaOrden;
+    }
+
+    function enviarResumenSecretaria() {
+      const numSec = fmtWa(cfg.secretariaWa);
+      if (!numSec) {
+        alert("Configura el WhatsApp de Secretaría en ⚙️.");
+        return;
+      }
+
+      let d = null;
+      let enlaceOrden = construirEnlaceCompartible();
+
+      if (document.getElementById("recPlaca").value.trim() && document.getElementById("recCliente").value.trim()) {
+        const creada = crearYGuardarOrdenDesdeRecepcion();
+        if (!creada) return;
+        d = creada;
+        enlaceOrden = construirEnlaceCompartible(creada.id);
+        limpiarFormularioRecepcion();
+        irATab(3);
+      } else {
+        d = capturarDatosRecepcion();
+        guardarEnCacheLocal(d);
+      }
+
+      const lineas = [
+        "*RESUMEN DE RECEPCIÓN - " + cfg.nombreTaller + "*",
+        "OT: " + (d.ot || "Sin OT"),
+        "Placa: " + (d.placa || "No registrada"),
+        "Vehículo: " + (d.vehiculo || "No registrado"),
+        "Cédula del cliente: " + (d.cedula || "No registrada"),
+        "Cliente: " + (d.cliente || "No registrado"),
+        "WhatsApp cliente: " + (d.whatsapp || "No registrado")
+      ];
+      if (d.email) lineas.push("Email cliente: " + d.email);
+      lineas.push(
+        "Kilometraje: " + (d.km || "-") + " | Combustible: " + d.combustible,
+        "Asesor / Técnico que receptó: " + (d.asesor || "No registrado"),
+        "Fecha y hora de recibido: " + fmtFecha(d.fechaRecibido),
+        "Tiempo de recepción: " + d.tiempoRecepcion,
+        "Motivo de ingreso: " + d.tipoIngreso
+      );
+      if (d.tipoIngreso === "Falla / Diagnóstico") {
+        lineas.push(
+          "Falla reportada: " + (d.falla || "Sin detalle"),
+          "Testigos encendidos: " + d.testigos,
+          "Autoriza prueba de ruta: " + d.autorizaRuta + (d.obsRutaIni ? " (" + d.obsRutaIni + ")" : "")
+        );
+      }
+      lineas.push("Inspección visual: " + d.inspeccionVisual);
+      if (d.inspeccionVisual === "Novedad") {
+        const pinesInfo = obtenerResumenPines(d.fotosNovedad);
+        lineas.push("Fotos de novedad: " + d.fotosNovedad.length + " | Pines marcados: " + pinesInfo.length);
+        pinesInfo.forEach(function (item) {
+          lineas.push("- Pin #" + item.num + " (Foto " + item.fotoNum + "): " + item.desc);
+        });
+      }
+      lineas.push(
+        "Lo que hay en el vehículo: " + d.loQueHayEnVehiculo,
+        "",
+        enlaceOrden
+      );
+
+      window.open("https://wa.me/" + numSec + "?text=" + encodeURIComponent(lineas.join("\n")), "_blank", "noopener,noreferrer");
+    }
+
+    function guardarRecepcion() {
+      const creada = crearYGuardarOrdenDesdeRecepcion();
+      if (!creada) return;
+      limpiarFormularioRecepcion();
+      irATab(3);
+    }
+
+    function limpiarFormularioRecepcion() {
+      ["recCedula", "recPlaca", "recOt", "recCliente", "recWhatsapp", "recEmail", "recVehiculo",
+       "recKm", "recFalla", "recObsRutaIni", "recPertenenciasExtra",
+       "recFotoVehiculoInput", "recFotosNovedadInput"]
+        .forEach(function (id) {
+          const el = document.getElementById(id);
+          if (el) el.value = "";
+        });
+      document.getElementById("estadoCedula").textContent = "";
+      document.getElementById("estadoPlaca").textContent = "";
+      document.getElementById("recCombustible").value = "1/2";
+      document.getElementById("recTipoIngreso").value = "Mantenimiento preventivo";
+      document.getElementById("recAutorizaRuta").value = "No aplica";
+      document.getElementById("recInspeccionVisual").value = "Sin novedad";
+      limpiarChecks("grupoTestigos");
+      limpiarChecks("grupoInventario");
+      fotoVehiculoActual = "";
+      fotosNovedadActual = [];
+      renderFotoVehiculoRec();
+      toggleBloqueFalla();
+      toggleBloqueNovedad();
+      toggleMotivosNoAplica();
+      actualizarBotonCedula();
+      actualizarBotonPlaca();
+      reiniciarCronoRecepcion();
+    }
+
+    /* TIEMPO EN TALLER */
+    function obtenerSegundosTaller(o) {
+      if (o.estado === "taller" && o.tallerInicioMs) {
+        return Math.max(0, Math.floor((Date.now() - o.tallerInicioMs) / 1000));
+      }
+      return Number(o.tallerSegsFinal || 0);
+    }
+
+    function moverAEntrega(id) {
+      const idx = ordenes.findIndex(function (o) { return o.id === id; });
+      if (idx === -1) return;
+
+      const segsTaller = obtenerSegundosTaller(ordenes[idx]);
+      ordenes[idx].tallerSegsFinal = segsTaller;
+      ordenes[idx].tiempoTaller = fmtSeg(segsTaller);
+      ordenes[idx].estado = "entrega";
+      ordenes[idx].fechaEntrega = ahoraISO();
+
+      entInicioMs = Date.now();
+      saveOrdenes(true);
+      cargarOrdenPorId(id, false);
+      irATab(4);
+    }
+
+    /* SERVICIOS CON CANTIDAD + SERVICIO + PRECIO */
+    function agregarServicio() {
+      const cantEl = document.getElementById("srvCant");
+      const nomEl = document.getElementById("srvNombre");
+      const prcEl = document.getElementById("srvPrecio");
+
+      const cantidad = Math.max(1, parseInt(cantEl.value || "1", 10) || 1);
+      const servicio = nomEl.value.trim();
+      const precio = parseFloat(prcEl.value);
+
+      if (!servicio || isNaN(precio) || precio < 0) {
+        alert("Ingresa la cantidad, el servicio y el precio.");
+        return;
+      }
+
+      serviciosActuales.push({
+        cantidad: cantidad,
+        servicio: servicio,
+        precio: precio
+      });
+
+      cantEl.value = "1";
+      nomEl.value = "";
+      prcEl.value = "";
+      renderServiciosUI();
+      renderInformeEntrega();
+    }
+
+    function eliminarServicio(idx) {
+      serviciosActuales.splice(idx, 1);
+      renderServiciosUI();
+      renderInformeEntrega();
+    }
+
+    function renderServiciosUI() {
+      const cont = document.getElementById("listaServiciosUI");
+      cont.innerHTML = serviciosActuales.map(function (s, i) {
+        const sub = Number(s.cantidad || 1) * Number(s.precio || 0);
+        return (
+          '<div class="order-item" style="padding:8px 10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; gap:8px;">' +
+            '<span style="font-size:13px;"><strong>' + escapeHtml(s.cantidad) + 'x</strong> · ' + escapeHtml(s.servicio) + ' · ' + fmtPrecio(s.precio) + ' c/u (<strong>' + fmtPrecio(sub) + '</strong>)</span>' +
+            '<button type="button" class="btn btn-danger" style="padding:4px 9px; font-size:12px;" onclick="eliminarServicio(' + i + ')">×</button>' +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    function cargarOrdenPorId(id, cambiarA4) {
+      const o = ordenes.find(function (item) { return item.id === id; });
+      if (!o) return;
+
+      ordenSeleccionadaId = o.id;
+      if (!o.fechaEntrega) o.fechaEntrega = ahoraISO();
+      if (!entInicioMs) entInicioMs = Date.now();
+
+      document.getElementById("entCedula").value = o.cedula || "";
+      document.getElementById("entCliente").value = o.cliente || "";
+      document.getElementById("entWhatsapp").value = o.whatsapp || "";
+      document.getElementById("entEmail").value = o.email || "";
+      document.getElementById("entWhatsappNuevo").value = "";
+      document.getElementById("entEmailNuevo").value = "";
+      document.getElementById("entPlaca").value = o.placa || "";
+      document.getElementById("entVehiculo").value = o.vehiculo || "";
+      document.getElementById("entAsesor").value = o.asesor || "";
+      document.getElementById("entFalla").value = o.falla || "";
+      document.getElementById("entTrabajos").value = o.trabajos || "";
+      document.getElementById("entEstadoVehiculo").value = o.estadoEntregaVehiculo || "Operativo y listo para circular";
+      document.getElementById("entPruebaFinal").value = o.pruebaFinal || "Aprobada sin novedades";
+      document.getElementById("entObsPruebaFinal").value = o.obsPruebaFinal || "";
+      document.getElementById("entFormaPago").value = o.formaPago || "Efectivo";
+      document.getElementById("avisoEnvioPDF").textContent = "";
+      document.getElementById("bloqueEnvioPostCierre").style.display = o.estado === "historial" ? "flex" : "none";
+
+      fotoVehiculoActual = o.fotoVehiculo || "";
+      fotosNovedadActual = Array.isArray(o.fotosNovedad) ? JSON.parse(JSON.stringify(o.fotosNovedad)) : [];
+      renumerarPinesNovedad();
+      serviciosActuales = Array.isArray(o.servicios) ? o.servicios.slice() : [];
+
+      renderServiciosUI();
+      renderInformeEntrega();
+      if (cambiarA4) irATab(4);
+    }
+
+    function obtenerDatosInformeActual() {
+      const ordenActiva = ordenes.find(function (item) { return item.id === ordenSeleccionadaId; }) || {};
+      const fechaRec = ordenActiva.fechaRecibido || ahoraISO();
+      const fechaEnt = ordenActiva.fechaEntrega || ahoraISO();
+      const segsEntregaActual = ordenActiva.estado === "historial"
+        ? (ordenActiva.tiempoEntrega || "00:00:00")
+        : fmtSeg(entInicioMs ? Math.max(0, Math.floor((Date.now() - entInicioMs) / 1000)) : 0);
+
+      const waBase = document.getElementById("entWhatsapp").value.trim();
+      const waNuevo = document.getElementById("entWhatsappNuevo").value.trim();
+      const emailBase = document.getElementById("entEmail").value.trim();
+      const emailNuevo = document.getElementById("entEmailNuevo").value.trim();
+
+      return {
+        ordenActiva: ordenActiva,
+        cedula: limpiarCed(document.getElementById("entCedula").value) || "No registrada",
+        cliente: document.getElementById("entCliente").value.trim() || "No registrado",
+        whatsappBase: waBase,
+        whatsappNuevo: waNuevo,
+        whatsappDestino: waNuevo || waBase,
+        emailBase: emailBase,
+        emailNuevo: emailNuevo,
+        emailDestino: emailNuevo || emailBase,
+        placa: limpiarPlc(document.getElementById("entPlaca").value) || "No registrada",
+        vehiculo: document.getElementById("entVehiculo").value.trim() || "No registrado",
+        asesor: document.getElementById("entAsesor").value.trim() || "No registrado",
+        recibidoFmt: fmtFecha(fechaRec),
+        entregaFmt: fmtFecha(fechaEnt),
+        tiempoRecepcion: ordenActiva.tiempoRecepcion || "00:00:00",
+        tiempoTaller: ordenActiva.tiempoTaller || "00:00:00",
+        tiempoEntrega: segsEntregaActual,
+        falla: document.getElementById("entFalla").value.trim() || "Sin detalle",
+        trabajos: document.getElementById("entTrabajos").value.trim() || "Sin observaciones",
+        estadoEntregaVehiculo: document.getElementById("entEstadoVehiculo").value,
+        pruebaFinal: document.getElementById("entPruebaFinal").value,
+        obsPruebaFinal: document.getElementById("entObsPruebaFinal").value.trim() || "Sin novedades adicionales",
+        formaPago: document.getElementById("entFormaPago").value || "Efectivo",
+        servicios: serviciosActuales.slice()
+      };
+    }
+
+    function renderInformeEntrega() {
+      const d = obtenerDatosInformeActual();
+      const tieneEmail = Boolean(d.emailDestino);
+      document.getElementById("btnEntEmail").style.display = tieneEmail ? "inline-flex" : "none";
+
+      const fotoAutoCont = document.getElementById("pdfFotoAuto");
+      fotoAutoCont.innerHTML = fotoVehiculoActual
+        ? '<img src="' + fotoVehiculoActual + '" alt="Foto del vehículo" />'
+        : "Sin foto del vehículo";
+
+      document.getElementById("pdfBloqueCliente").innerHTML =
+        '<div class="pdf-box-title">Datos del cliente</div>' +
+        '<div><strong>Nombre:</strong> ' + escapeHtml(d.cliente) + '</div>' +
+        '<div><strong>Cédula:</strong> ' + escapeHtml(d.cedula) + '</div>' +
+        '<div><strong>WhatsApp:</strong> ' + escapeHtml(d.whatsappBase || "No registrado") + (d.whatsappNuevo ? ' (Envío: ' + escapeHtml(d.whatsappNuevo) + ')' : '') + '</div>' +
+        '<div><strong>Email:</strong> ' + escapeHtml(d.emailBase || "No registrado") + (d.emailNuevo ? ' (Envío: ' + escapeHtml(d.emailNuevo) + ')' : '') + '</div>';
+
+      document.getElementById("pdfBloqueVehiculo").innerHTML =
+        '<div class="pdf-box-title">Datos del vehículo</div>' +
+        '<div><strong>Vehículo:</strong> ' + escapeHtml(d.vehiculo) + '</div>' +
+        '<div><strong>Placa:</strong> ' + escapeHtml(d.placa) + '</div>' +
+        '<div><strong>Kilometraje:</strong> ' + escapeHtml(d.ordenActiva.km || "-") + '</div>' +
+        '<div><strong>Combustible:</strong> ' + escapeHtml(d.ordenActiva.combustible || "-") + '</div>';
+
+      const otTexto = d.ordenActiva.ot || "Sin OT";
+      document.getElementById("pdfBannerOtAsesor").innerHTML =
+        '<div><strong>Orden de trabajo:</strong> ' + escapeHtml(otTexto) + '</div>' +
+        '<div><strong>Asesor/Técnico:</strong> ' + escapeHtml(d.asesor) + '</div>';
+
+      document.getElementById("pdfBloqueTiempos").innerHTML =
+        '<div class="pdf-time-item"><strong>Recibido:</strong><br/>' + escapeHtml(d.recibidoFmt) + '</div>' +
+        '<div class="pdf-time-item"><strong>Entrega:</strong><br/>' + escapeHtml(d.entregaFmt) + '</div>' +
+        '<div class="pdf-time-item"><strong>Tiempo en recepción:</strong><br/>' + escapeHtml(d.tiempoRecepcion) + '</div>' +
+        '<div class="pdf-time-item"><strong>Tiempo en taller:</strong><br/>' + escapeHtml(d.tiempoTaller) + '</div>' +
+        '<div class="pdf-time-item"><strong>Tiempo en entrega:</strong><br/>' + escapeHtml(d.tiempoEntrega) + '</div>';
+
+      const testigosLinea = (d.ordenActiva.testigos && d.ordenActiva.testigos !== "No aplica")
+        ? '<div><strong>Testigos:</strong> ' + escapeHtml(d.ordenActiva.testigos) + '</div>'
+        : '';
+
+      document.getElementById("pdfBloqueDiagnostico").innerHTML =
+        '<div style="margin-bottom:6px;"><strong>Motivo de ingreso / falla:</strong> ' + escapeHtml(d.falla) + '</div>' +
+        '<div style="margin-bottom:6px;"><strong>Trabajo realizado:</strong> ' + escapeHtml(d.trabajos) + '</div>' +
+        testigosLinea;
+
+      document.getElementById("pdfBloqueEntregaPrueba").innerHTML =
+        '<div style="margin-bottom:4px;"><strong>Estado en que se entrega el vehículo:</strong> ' + escapeHtml(d.estadoEntregaVehiculo) + '</div>' +
+        '<div style="margin-bottom:4px;"><strong>Prueba de ruta final:</strong> ' + escapeHtml(d.pruebaFinal) + '</div>' +
+        '<div><strong>Observaciones de prueba final:</strong> ' + escapeHtml(d.obsPruebaFinal) + '</div>';
+
+      let total = 0;
+      let filasHtml = "";
+      if (d.servicios.length === 0) {
+        filasHtml = '<tr><td>-</td><td style="color:#64748b;">Sin servicios detallados</td><td class="num">$0.00</td><td class="num">$0.00</td></tr>';
+      } else {
+        d.servicios.forEach(function (s) {
+          const cant = Number(s.cantidad || 1);
+          const prc = Number(s.precio || 0);
+          const sub = cant * prc;
+          total += sub;
+          filasHtml +=
+            '<tr>' +
+              '<td>' + escapeHtml(cant) + '</td>' +
+              '<td>' + escapeHtml(s.servicio) + '</td>' +
+              '<td class="num">' + fmtPrecio(prc) + '</td>' +
+              '<td class="num">' + fmtPrecio(sub) + '</td>' +
+            '</tr>';
+        });
+      }
+      filasHtml += '<tr class="pdf-total-row"><td colspan="3">TOTAL</td><td class="num">' + fmtPrecio(total) + '</td></tr>';
+      filasHtml += '<tr><td colspan="3"><strong>Forma de pago</strong></td><td class="num"><strong>' + escapeHtml(d.formaPago) + '</strong></td></tr>';
+      document.getElementById("pdfCuerpoServicios").innerHTML = filasHtml;
+
+      const loQueHayTexto = d.ordenActiva.loQueHayEnVehiculo
+        || combinarInventarioYExtra(d.ordenActiva.inventario || "", d.ordenActiva.pertenenciasExtra || "");
+
+      const pinesInfo = obtenerResumenPines(fotosNovedadActual);
+      const estadoInsp = d.ordenActiva.inspeccionVisual || (pinesInfo.length > 0 || fotosNovedadActual.length > 0 ? "Novedad" : "Sin novedad");
+
+      let detallePinesHtml = "";
+      if (estadoInsp === "Novedad") {
+        if (pinesInfo.length > 0) {
+          detallePinesHtml = pinesInfo.map(function (item) {
+            return (
+              '<div class="pin-report-item">' +
+                '<strong>Pin #' + item.num + ' (Foto ' + item.fotoNum + '):</strong> ' + escapeHtml(item.desc) +
+              '</div>'
+            );
+          }).join("");
+        } else {
+          detallePinesHtml = '<div style="margin-top:4px; color:#64748b;">Novedad registrada sin pines marcados.</div>';
+        }
+      }
+
+      document.getElementById("pdfBloqueInspeccionFinal").innerHTML =
+        '<div><strong>Lo que hay en el vehículo:</strong> ' + escapeHtml(loQueHayTexto) + '</div>' +
+        '<div style="margin-top:4px;"><strong>Inspección visual:</strong> ' + escapeHtml(estadoInsp) + '</div>' +
+        detallePinesHtml;
+
+      const galNov = document.getElementById("galeriaNovedadPdf");
+      galNov.innerHTML = (estadoInsp === "Novedad" && fotosNovedadActual.length)
+        ? renderHtmlFotosNovedad(fotosNovedadActual, false)
+        : '<p style="color:#64748b; font-size:12px; margin:0;">Sin fotos de novedades.</p>';
+    }
+
+    /* GENERACIÓN DE PDF VERTICAL (PORTRAIT) */
+    async function crearArchivoPDFVertical() {
+      renderInformeEntrega();
+      const elemento = document.getElementById("areaImpresionPDF");
+      const placa = limpiarPlc(document.getElementById("entPlaca").value) || "VEHICULO";
+      const nombreArchivo = "Informe_" + placa + ".pdf";
+
+      if (typeof html2pdf === "undefined") {
+        window.print();
+        return null;
+      }
+
+      const opt = {
+        margin: [8, 8, 8, 8],
+        filename: nombreArchivo,
+        image: { type: "jpeg", quality: 0.92 },
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+      };
+
+      const blob = await html2pdf().set(opt).from(elemento).toPdf().get("pdf").then(function (pdf) {
+        return pdf.output("blob");
+      });
+      const file = new File([blob], nombreArchivo, { type: "application/pdf" });
+      return { blob: blob, file: file, nombreArchivo: nombreArchivo };
+    }
+
+    function forzarDescargaBlob(blob, nombreArchivo) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = nombreArchivo;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 3000);
+    }
+
+    function construirTextoWhatsAppEntrega(d) {
+      let total = 0;
+      d.servicios.forEach(function (s) {
+        total += Number(s.cantidad || 1) * Number(s.precio || 0);
+      });
+      return [
+        "*INFORME DE ENTREGA - " + cfg.nombreTaller + "*",
+        "Cliente: " + d.cliente,
+        "Vehículo: " + d.vehiculo + " | Placa: " + d.placa,
+        "Orden de trabajo: " + (d.ordenActiva.ot || "Sin OT"),
+        "Asesor/Técnico: " + d.asesor,
+        "Estado de entrega: " + d.estadoEntregaVehiculo,
+        "Prueba de ruta final: " + d.pruebaFinal,
+        "Total servicios: " + fmtPrecio(total),
+        "Forma de pago: " + d.formaPago
+      ].join("\n");
+    }
+
+    async function descargarPDFDirecto() {
+      const aviso = document.getElementById("avisoEnvioPDF");
+      aviso.textContent = "Generando PDF vertical...";
+      const res = await crearArchivoPDFVertical();
+      if (res) {
+        forzarDescargaBlob(res.blob, res.nombreArchivo);
+        aviso.textContent = "✓ PDF vertical descargado: " + res.nombreArchivo;
+      }
+    }
+
+    async function enviarPDFWhatsApp() {
+      const d = obtenerDatosInformeActual();
+      const aviso = document.getElementById("avisoEnvioPDF");
+      const wa = fmtWa(d.whatsappDestino);
+      if (!wa) {
+        alert("Ingresa el WhatsApp del cliente o un nuevo número de WhatsApp.");
+        return;
+      }
+
+      aviso.textContent = "Preparando envío por WhatsApp...";
+      const res = await crearArchivoPDFVertical();
+
+      if (res && navigator.canShare && navigator.canShare({ files: [res.file] })) {
+        try {
+          await navigator.share({
+            files: [res.file],
+            title: res.nombreArchivo
+          });
+          aviso.textContent = "✓ Informe compartido por WhatsApp sin guardar archivo local.";
+          return;
+        } catch (e) {}
+      }
+
+      const txt = construirTextoWhatsAppEntrega(d);
+      aviso.textContent = "✓ Abriendo WhatsApp (" + d.whatsappDestino + ") sin guardar archivo local.";
+      window.open("https://wa.me/" + wa + "?text=" + encodeURIComponent(txt), "_blank", "noopener,noreferrer");
+    }
+
+    async function enviarPDFEmail() {
+      const d = obtenerDatosInformeActual();
+      const aviso = document.getElementById("avisoEnvioPDF");
+      if (!d.emailDestino) {
+        alert("Ingresa el email del cliente o un nuevo email.");
+        return;
+      }
+
+      aviso.textContent = "Generando PDF vertical...";
+      const res = await crearArchivoPDFVertical();
+      if (!res) return;
+
+      forzarDescargaBlob(res.blob, res.nombreArchivo);
+
+      if (navigator.canShare && navigator.canShare({ files: [res.file] })) {
+        try {
+          await navigator.share({
+            files: [res.file],
+            title: res.nombreArchivo
+          });
+          aviso.textContent = "✓ PDF vertical compartido (" + res.nombreArchivo + ").";
+          return;
+        } catch (e) {}
+      }
+
+      aviso.textContent = "✓ PDF vertical guardado (" + res.nombreArchivo + "). Adjúntalo en el correo a " + d.emailDestino + ".";
+      window.location.href = "mailto:" + encodeURIComponent(d.emailDestino) + "?subject=" + encodeURIComponent(res.nombreArchivo);
+    }
+
+    function cerrarOrdenYMostrarEnvio() {
+      const d = obtenerDatosInformeActual();
+      const idx = ordenes.findIndex(function (o) { return o.id === ordenSeleccionadaId; });
+
+      const actualizado = {
+        cedula: d.cedula === "No registrada" ? "" : d.cedula,
+        cliente: d.cliente === "No registrado" ? "" : d.cliente,
+        whatsapp: d.whatsappBase || d.whatsappNuevo || "",
+        email: d.emailBase || d.emailNuevo || "",
+        placa: d.placa === "No registrada" ? "" : d.placa,
+        vehiculo: d.vehiculo === "No registrado" ? "" : d.vehiculo,
+        asesor: d.asesor === "No registrado" ? "" : d.asesor,
+        falla: d.falla,
+        trabajos: d.trabajos,
+        estadoEntregaVehiculo: d.estadoEntregaVehiculo,
+        pruebaFinal: d.pruebaFinal,
+        obsPruebaFinal: d.obsPruebaFinal,
+        formaPago: d.formaPago,
+        servicios: d.servicios,
+        fotoVehiculo: fotoVehiculoActual,
+        fotosNovedad: JSON.parse(JSON.stringify(fotosNovedadActual)),
+        fechaEntrega: (idx !== -1 && ordenes[idx].fechaEntrega) ? ordenes[idx].fechaEntrega : ahoraISO(),
+        tiempoEntrega: d.tiempoEntrega,
+        estado: "historial"
+      };
+
+      if (idx !== -1) {
+        ordenes[idx] = Object.assign({}, ordenes[idx], actualizado);
+        ordenSeleccionadaId = ordenes[idx].id;
+      } else {
+        const nuevoId = String(Date.now());
+        ordenes.unshift(Object.assign({
+          id: nuevoId,
+          fechaRecibido: ahoraISO(),
+          tiempoRecepcion: "00:00:00",
+          tiempoTaller: "00:00:00"
+        }, actualizado));
+        ordenSeleccionadaId = nuevoId;
+      }
+
+      guardarEnCacheLocal(actualizado);
+      entInicioMs = null;
+      saveOrdenes(true);
+      renderInformeEntrega();
+      document.getElementById("bloqueEnvioPostCierre").style.display = "flex";
+      document.getElementById("avisoEnvioPDF").textContent = "✓ Orden cerrada y guardada en Historial. Selecciona cómo enviar:";
+    }
+
+    function borrarOrden(id) {
+      ordenes = ordenes.filter(function (o) { return o.id !== id; });
+      saveOrdenes(true);
+    }
+
+    function renderTodo() {
+      const taller = ordenes.filter(function (o) { return o.estado === "taller"; });
+      const entrega = ordenes.filter(function (o) { return o.estado === "entrega"; });
+      const historial = ordenes.filter(function (o) { return o.estado === "historial"; });
+
+      document.getElementById("badgeTaller").textContent = taller.length;
+      document.getElementById("badgeEntrega").textContent = entrega.length;
+      document.getElementById("badgeHistorial").textContent = historial.length;
+
+      document.getElementById("contenedorTaller").innerHTML = taller.length === 0
+        ? '<p style="color:#64748b; font-size:13px;">No hay vehículos en taller.</p>'
+        : taller.map(function (o) {
+            const esEnlace = ORDEN_URL_ID && String(o.id) === String(ORDEN_URL_ID);
+            return (
+              '<div class="order-item' + (esEnlace ? ' destacada' : '') + '">' +
+                '<div class="order-top">' +
+                  '<strong>' + escapeHtml(o.placa) + ' · ' + escapeHtml(o.vehiculo) + '</strong>' +
+                  '<span class="tag">' + escapeHtml(o.ot || "SIN OT") + '</span>' +
+                '</div>' +
+                '<div style="font-size:13px; color:#334155; line-height:1.5;">' +
+                  'Cliente: ' + escapeHtml(o.cliente) + ' | Cédula: ' + escapeHtml(o.cedula || "-") + ' | Asesor/Técnico: ' + escapeHtml(o.asesor || "-") + '<br/>' +
+                  'Recibido: ' + escapeHtml(fmtFecha(o.fechaRecibido)) + ' · Tiempo recepción: ' + escapeHtml(o.tiempoRecepcion || "00:00:00") + '<br/>' +
+                  '⏱️ <strong>Tiempo en taller (automático): <span id="taller-timer-' + escapeAttr(o.id) + '">' + fmtSeg(obtenerSegundosTaller(o)) + '</span></strong>' +
+                '</div>' +
+                '<div class="btn-group">' +
+                  '<button type="button" class="btn btn-success" onclick="moverAEntrega(\'' + escapeAttr(o.id) + '\')">Pasar a 4. Entrega</button>' +
+                  '<button type="button" class="btn btn-danger" onclick="borrarOrden(\'' + escapeAttr(o.id) + '\')">Eliminar</button>' +
+                '</div>' +
+              '</div>'
+            );
+          }).join("");
+
+      document.getElementById("contenedorPendientesEntrega").innerHTML = entrega.length === 0
+        ? ""
+        : entrega.map(function (o) {
+            return (
+              '<div class="order-item">' +
+                '<div class="order-top">' +
+                  '<strong>' + escapeHtml(o.placa) + ' · ' + escapeHtml(o.vehiculo) + '</strong>' +
+                  '<span class="tag">LISTO PARA ENTREGA</span>' +
+                '</div>' +
+                '<div style="font-size:13px; color:#334155;">' +
+                  'Cliente: ' + escapeHtml(o.cliente) + ' | WhatsApp: ' + escapeHtml(o.whatsapp) + (o.email ? ' | Email: ' + escapeHtml(o.email) : '') +
+                '</div>' +
+                '<div class="btn-group">' +
+                  '<button type="button" class="btn btn-primary" onclick="cargarOrdenPorId(\'' + escapeAttr(o.id) + '\', false)">Cargar en Informe PDF</button>' +
+                '</div>' +
+              '</div>'
+            );
+          }).join("");
+
+      document.getElementById("contenedorHistorial").innerHTML = historial.length === 0
+        ? '<p style="color:#64748b; font-size:13px;">Aún no hay vehículos en el historial.</p>'
+        : historial.map(function (o) {
+            return (
+              '<div class="order-item">' +
+                '<div class="order-top">' +
+                  '<strong>' + escapeHtml(o.placa) + ' · ' + escapeHtml(o.vehiculo) + '</strong>' +
+                  '<span class="tag">ENTREGADO</span>' +
+                '</div>' +
+                '<div style="font-size:13px; color:#334155; line-height:1.5;">' +
+                  'Cliente: ' + escapeHtml(o.cliente) + ' | Cédula: ' + escapeHtml(o.cedula || "-") + ' | Asesor/Técnico: ' + escapeHtml(o.asesor || "-") + '<br/>' +
+                  'Recibido: ' + escapeHtml(fmtFecha(o.fechaRecibido)) + ' · Entrega: ' + escapeHtml(fmtFecha(o.fechaEntrega)) + '<br/>' +
+                  'Tiempos → Recepción: ' + escapeHtml(o.tiempoRecepcion || "-") + ' | Taller: ' + escapeHtml(o.tiempoTaller || "-") + ' | Entrega: ' + escapeHtml(o.tiempoEntrega || "-") +
+                '</div>' +
+                '<div class="btn-group">' +
+                  '<button type="button" class="btn btn-primary" onclick="cargarOrdenPorId(\'' + escapeAttr(o.id) + '\', true)">Ver PDF / Reenviar</button>' +
+                  '<button type="button" class="btn btn-danger" onclick="borrarOrden(\'' + escapeAttr(o.id) + '\')">Eliminar</button>' +
+                '</div>' +
+              '</div>'
+            );
+          }).join("");
+    }
+
+    setInterval(function () {
+      ordenes.forEach(function (o) {
+        if (o.estado === "taller") {
+          const el = document.getElementById("taller-timer-" + o.id);
+          if (el) el.textContent = fmtSeg(obtenerSegundosTaller(o));
+        }
+      });
+    }, 1000);
+
+    (function init() {
+      try {
+        aplicarCfgUI();
+        renderFotoVehiculoRec();
+        toggleBloqueFalla();
+        toggleBloqueNovedad();
+        toggleMotivosNoAplica();
+        actualizarBotonCedula();
+        actualizarBotonPlaca();
+        renderServiciosUI();
+        renderTodo();
+        renderInformeEntrega();
+        sincronizarDesdeNube(true);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  </script>
+</body>
+</html>
